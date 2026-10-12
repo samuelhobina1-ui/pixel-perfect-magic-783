@@ -14,16 +14,324 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string | null
+          name: string
+          slug: string
+          sort_order: number
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          name: string
+          slug: string
+          sort_order?: number
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          name?: string
+          slug?: string
+          sort_order?: number
+          status?: string
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          auto_checks: Json | null
+          category: string
+          cost_price: number
+          created_at: string
+          customer_whatsapp: string
+          delivered_at: string | null
+          delivery_mode: string | null
+          id: string
+          order_code: string
+          pin_delivered: string | null
+          player_id: string
+          price: number
+          product_id: string | null
+          product_name: string
+          receipt_hash: string | null
+          receipt_image_url: string
+          reject_reason: string | null
+          status: string
+          transaction_id: string
+        }
+        Insert: {
+          auto_checks?: Json | null
+          category: string
+          cost_price?: number
+          created_at?: string
+          customer_whatsapp: string
+          delivered_at?: string | null
+          delivery_mode?: string | null
+          id?: string
+          order_code: string
+          pin_delivered?: string | null
+          player_id: string
+          price: number
+          product_id?: string | null
+          product_name: string
+          receipt_hash?: string | null
+          receipt_image_url: string
+          reject_reason?: string | null
+          status?: string
+          transaction_id: string
+        }
+        Update: {
+          auto_checks?: Json | null
+          category?: string
+          cost_price?: number
+          created_at?: string
+          customer_whatsapp?: string
+          delivered_at?: string | null
+          delivery_mode?: string | null
+          id?: string
+          order_code?: string
+          pin_delivered?: string | null
+          player_id?: string
+          price?: number
+          product_id?: string | null
+          product_name?: string
+          receipt_hash?: string | null
+          receipt_image_url?: string
+          reject_reason?: string | null
+          status?: string
+          transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "product_stock"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pins_stock: {
+        Row: {
+          created_at: string
+          id: string
+          is_used: boolean
+          pin_code: string
+          product_id: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_used?: boolean
+          pin_code: string
+          product_id: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_used?: boolean
+          pin_code?: string
+          product_id?: string
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pins_stock_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "product_stock"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "pins_stock_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      price_change_log: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          id: string
+          new_price: number | null
+          old_price: number | null
+          product_id: string | null
+          product_name: string | null
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          new_price?: number | null
+          old_price?: number | null
+          product_id?: string | null
+          product_name?: string | null
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          new_price?: number | null
+          old_price?: number | null
+          product_id?: string | null
+          product_name?: string | null
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          category_id: string
+          cost_price: number
+          created_at: string
+          deleted_at: string | null
+          description: string | null
+          how_to_use: string | null
+          id: string
+          image_url: string | null
+          name: string
+          price_naira: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          category_id: string
+          cost_price?: number
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          how_to_use?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          price_naira: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string
+          cost_price?: number
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          how_to_use?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          price_naira?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      settings: {
+        Row: {
+          auto_mode: boolean
+          id: number
+          low_stock_threshold: number
+          opay_name: string
+          opay_number: string
+          whatsapp_number: string
+          whatsapp_template: string
+        }
+        Insert: {
+          auto_mode?: boolean
+          id?: number
+          low_stock_threshold?: number
+          opay_name?: string
+          opay_number?: string
+          whatsapp_number?: string
+          whatsapp_template?: string
+        }
+        Update: {
+          auto_mode?: boolean
+          id?: number
+          low_stock_threshold?: number
+          opay_name?: string
+          opay_number?: string
+          whatsapp_number?: string
+          whatsapp_template?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      product_stock: {
+        Row: {
+          product_id: string | null
+          stock_count: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      approve_order: { Args: { _order_id: string }; Returns: string }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      place_order: {
+        Args: {
+          _player_id: string
+          _product_id: string
+          _receipt_hash: string
+          _receipt_url: string
+          _transaction_id: string
+          _whatsapp: string
+        }
+        Returns: Json
+      }
+      track_order: { Args: { _code: string; _whatsapp: string }; Returns: Json }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +458,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
