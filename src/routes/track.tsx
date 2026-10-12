@@ -30,7 +30,7 @@ function Track() {
     e.preventDefault(); setBusy(true);
     const { data, error } = await supabase.rpc("track_order", { _code: code, _whatsapp: wa });
     setBusy(false);
-    if (error || !data) { setRes(null); return toast.error("Order not found. Check the ID and WhatsApp number."); }
+    if (error || !data) { setRes(null); { toast.error("Order not found. Check the ID and WhatsApp number."); return; } }
     setRes(data as unknown as T);
   }
   return (

@@ -26,7 +26,7 @@ export function BuyDialog({ product, onClose }: { product: PublicProduct | null;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!product || !file) return toast.error("Please upload your payment receipt");
+    if (!product || !file) { toast.error("Please upload your payment receipt"); return; }
     setBusy(true);
     try {
       const hash = await sha256File(file);

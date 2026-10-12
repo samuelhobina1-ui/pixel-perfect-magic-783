@@ -69,7 +69,7 @@ function AdminLogin() {
       ? await supabase.auth.signInWithPassword({ email, password: pw })
       : await supabase.auth.signUp({ email, password: pw, options: { emailRedirectTo: `${window.location.origin}/admin` } });
     setBusy(false);
-    if (r.error) return toast.error(r.error.message);
+    if (r.error) { toast.error(r.error.message); return; }
     if (mode === "up" && !r.data.session) toast.success("Check your email to confirm, then sign in.");
   }
   return (

@@ -45,22 +45,22 @@ function Dashboard() {
   };
   async function approve(o: Order) {
     const { data, error } = await supabase.rpc("approve_order", { _order_id: o.id });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Approved"); sendWa(o, data as string); reload();
   }
   async function reject(o: Order) {
     const reason = prompt("Reason for rejection?"); if (reason === null) return;
     const { error } = await supabase.from("orders").update({ status: "rejected", reject_reason: reason }).eq("id", o.id);
-    if (error) return toast.error(error.message); toast.success("Rejected"); reload();
+    if (error) { toast.error(error.message); return; } toast.success("Rejected"); reload();
   }
   async function edit(o: Order, field: "customer_whatsapp" | "player_id") {
     const v = prompt(`New ${field === "player_id" ? "Player ID" : "WhatsApp"}`, o[field]); if (!v) return;
-    const { error } = await supabase.from("orders").update({ [field]: v }).eq("id", o.id);
-    if (error) return toast.error(error.message); reload();
+    const { error } = await supabase.from("orders").update(field === "player_id" ? { player_id: v } : { customer_whatsapp: v }).eq("id", o.id);
+    if (error) { toast.error(error.message); return; } reload();
   }
   async function viewReceipt(o: Order) {
     const { data, error } = await supabase.storage.from("receipts").createSignedUrl(o.receipt_image_url, 600);
-    if (error) return toast.error(error.message); window.open(data.signedUrl, "_blank");
+    if (error) { toast.error(error.message); return; } window.open(data.signedUrl, "_blank");
   }
   function exportCsv() {
     const rows = [["Order ID", "Delivered", "Mode", "Product", "Category", "Price", "Profit", "WhatsApp", "PIN", "Player ID", "Transaction ID"],
