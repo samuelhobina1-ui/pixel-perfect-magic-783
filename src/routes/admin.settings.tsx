@@ -25,21 +25,21 @@ function SettingsPage() {
   async function save() {
     if (!s) return;
     const { error } = await supabase.from("settings").update(s).eq("id", 1);
-    if (error) return toast.error(error.message); toast.success("Settings saved"); refresh();
+    if (error) { toast.error(error.message); return; } toast.success("Settings saved"); refresh();
   }
   async function addCat(e: React.FormEvent) {
     e.preventDefault();
     const { error } = await supabase.from("categories").insert({ name: cat.name.trim(), slug: slugify(cat.name), image_url: cat.image_url || null });
-    if (error) return toast.error(error.message); toast.success(`Page /${slugify(cat.name)} created`); setCat({ name: "", image_url: "" }); refresh();
+    if (error) { toast.error(error.message); return; } toast.success(`Page /${slugify(cat.name)} created`); setCat({ name: "", image_url: "" }); refresh();
   }
   async function updateCat(id: string, patch: { name?: string; status?: string }) {
     const { error } = await supabase.from("categories").update(patch).eq("id", id);
-    if (error) return toast.error(error.message); refresh();
+    if (error) { toast.error(error.message); return; } refresh();
   }
   async function delCat(id: string) {
     if (!confirm("Delete this category? Only works if it has no products.")) return;
     const { error } = await supabase.from("categories").delete().eq("id", id);
-    if (error) return toast.error("Move or delete its products first"); refresh();
+    if (error) { toast.error("Move or delete its products first"); return; } refresh();
   }
   if (!s) return null;
   return (

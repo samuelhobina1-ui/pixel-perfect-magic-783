@@ -54,17 +54,17 @@ function Products() {
 
   async function del(p: Product) {
     const { count } = await supabase.from("orders").select("id", { count: "exact", head: true }).eq("product_id", p.id).eq("status", "pending");
-    if (count) return toast.error("Cannot delete: has pending orders");
+    if (count) { toast.error("Cannot delete: has pending orders"); return; }
     if (!confirm(`Are you sure? Delete ${p.name}?`)) return;
     const { error } = await supabase.from("products").update({ deleted_at: new Date().toISOString(), status: "inactive" }).eq("id", p.id);
-    if (error) return toast.error(error.message); toast.success("Moved to trash"); refresh();
+    if (error) { toast.error(error.message); return; } toast.success("Moved to trash"); refresh();
   }
   const ids = [...sel];
   async function bulk(action: "delete" | "active" | "inactive" | "price" | "stock") {
-    if (!ids.length) return toast.error("Select products first");
+    if (!ids.length) { toast.error("Select products first"); return; }
     if (action === "delete") {
       const { count } = await supabase.from("orders").select("id", { count: "exact", head: true }).in("product_id", ids).eq("status", "pending");
-      if (count) return toast.error("Some selected products have pending orders");
+      if (count) { toast.error("Some selected products have pending orders"); return; }
       if (!confirm(`Delete ${ids.length} products?`)) return;
       await supabase.from("products").update({ deleted_at: new Date().toISOString(), status: "inactive" }).in("id", ids);
     } else if (action === "active" || action === "inactive") {
@@ -89,7 +89,7 @@ function Products() {
           <h1 className="text-2xl font-bold">Products <span className="text-primary">({products.length})</span></h1>
           <p className="text-xs text-muted-foreground">Last added: {lastAdded?.name} · Last edited: {lastEdited?.name} {lastEdited && new Date(lastEdited.updated_at).toLocaleString()}</p>
         </div>
-        <Button size="lg" onClick={() => setEditing({ status: "active", category_id: cats[0]?.id })}><Plus className="mr-1" />Add New Product</Button>
+        <Button size="lg" onClick={() => setEditing({ status: "active", ...(cats[0] ? { category_id: cats[0].id } : {}) })}><Plus className="mr-1" />Add New Product</Button>
       </div>
       <div className="flex flex-wrap gap-2">
         <Input className="max-w-xs" placeholder="Search..." value={q} onChange={(e) => setQ(e.target.value)} />

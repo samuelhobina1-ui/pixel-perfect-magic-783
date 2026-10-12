@@ -40,12 +40,12 @@ function StockRow({ p }: { p: ReturnType<typeof useAdminData>["products"][number
 
   async function savePrice() {
     const { error } = await supabase.from("products").update({ price_naira: Number(price), cost_price: Number(cost) }).eq("id", p.id);
-    if (error) return toast.error(error.message); toast.success("Saved"); refresh();
+    if (error) { toast.error(error.message); return; } toast.success("Saved"); refresh();
   }
   async function addPins() {
     const list = pins.split("\n").map((s) => s.trim()).filter(Boolean); if (!list.length) return;
     const { error } = await supabase.from("pins_stock").insert(list.map((pin_code) => ({ product_id: p.id, pin_code })));
-    if (error) return toast.error(error.message); toast.success(`${list.length} PINs added`); setPins(""); refresh();
+    if (error) { toast.error(error.message); return; } toast.success(`${list.length} PINs added`); setPins(""); refresh();
   }
   async function loadPins() {
     const { data } = await supabase.from("pins_stock").select("id,pin_code").eq("product_id", p.id).eq("is_used", false).order("created_at");
