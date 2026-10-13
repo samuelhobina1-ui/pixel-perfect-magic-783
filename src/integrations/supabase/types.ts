@@ -64,6 +64,7 @@ export type Database = {
           receipt_image_url: string
           reject_reason: string | null
           status: string
+          tracking_id: string | null
           transaction_id: string
         }
         Insert: {
@@ -85,6 +86,7 @@ export type Database = {
           receipt_image_url: string
           reject_reason?: string | null
           status?: string
+          tracking_id?: string | null
           transaction_id: string
         }
         Update: {
@@ -106,6 +108,7 @@ export type Database = {
           receipt_image_url?: string
           reject_reason?: string | null
           status?: string
+          tracking_id?: string | null
           transaction_id?: string
         }
         Relationships: [
@@ -310,6 +313,11 @@ export type Database = {
     }
     Functions: {
       approve_order: { Args: { _order_id: string }; Returns: string }
+      get_order_by_tracking_id: {
+        Args: { _tracking_id: string }
+        Returns: Json
+      }
+      get_orders_by_whatsapp: { Args: { _whatsapp: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
