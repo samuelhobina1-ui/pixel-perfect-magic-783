@@ -51,6 +51,16 @@ export const settingsQuery = queryOptions({
   },
 });
 
+/** Customer-safe settings (payment details + message template) for checkout. */
+export const publicSettingsQuery = queryOptions({
+  queryKey: ["public-settings"],
+  queryFn: async () => {
+    const { data, error } = await supabase.rpc("public_settings");
+    if (error) throw error;
+    return data as unknown as Pick<Settings, "opay_number" | "opay_name" | "whatsapp_number" | "whatsapp_template">;
+  },
+});
+
 export function fillTemplate(tpl: string, v: { order: string; product: string; pin: string }) {
   return tpl.replaceAll("{order}", v.order).replaceAll("{product}", v.product).replaceAll("{pin}", v.pin);
 }
