@@ -29,7 +29,7 @@ export function Header() {
               </div>
             )}
           </div>
-          <Link to="/track" className={link} activeProps={{ className: "text-primary" }}>Track Order</Link>
+          <Link to="/track" className={link} activeProps={{ className: "text-primary" }}>My Orders</Link>
           <Link to="/contact" className={link} activeProps={{ className: "text-primary" }}>Contact</Link>
         </nav>
         <button className="md:hidden" onClick={() => setOpen(!open)} aria-label="Menu">{open ? <X /> : <Menu />}</button>
@@ -41,7 +41,7 @@ export function Header() {
           <div className="grid grid-cols-2 gap-1 pb-2 pl-3">
             {cats.map((c) => <Link key={c.id} to="/$slug" params={{ slug: c.slug }} className="py-1 text-sm text-muted-foreground">{c.name}</Link>)}
           </div>
-          <Link to="/track" className="block py-2">Track Order</Link>
+          <Link to="/track" className="block py-2">My Orders</Link>
           <Link to="/contact" className="block py-2">Contact</Link>
         </nav>
       )}
