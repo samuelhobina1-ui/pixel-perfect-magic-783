@@ -65,7 +65,8 @@ function Dashboard() {
   function exportCsv() {
     const rows = [["Order ID", "Delivered", "Mode", "Product", "Category", "Price", "Profit", "WhatsApp", "PIN", "Player ID", "Transaction ID"],
       ...sold.map((o) => [o.order_code, o.delivered_at ?? "", o.delivery_mode ?? "", o.product_name, o.category, o.price, Number(o.price) - Number(o.cost_price), o.customer_whatsapp, o.pin_delivered ?? "", o.player_id, o.transaction_id])];
-    const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const safe = (c: unknown) => { let s = String(c); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; return `"${s.replace(/"/g, '""')}"`; };
+    const csv = rows.map((r) => r.map(safe).join(",")).join("\n");
     const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = `zgh-sales-${Date.now()}.csv`; a.click();
   }
 
