@@ -8,12 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { fillTemplate, naira, settingsQuery, sha256File, waLink, type PublicProduct } from "@/lib/store";
+import { fillTemplate, naira, publicSettingsQuery, sha256File, waLink, type PublicProduct } from "@/lib/store";
 
 type Result = { order_code: string; status: string; pin: string | null };
 
 export function BuyDialog({ product, onClose }: { product: PublicProduct | null; onClose: () => void }) {
-  const { data: settings } = useQuery(settingsQuery);
+  const { data: settings } = useQuery(publicSettingsQuery);
   const [playerId, setPlayerId] = useState("");
   const [wa, setWa] = useState("");
   const [txn, setTxn] = useState("");

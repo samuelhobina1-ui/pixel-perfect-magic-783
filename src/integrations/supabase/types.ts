@@ -328,6 +328,7 @@ export type Database = {
         }
         Returns: Json
       }
+      public_settings: { Args: never; Returns: Json }
       track_order: { Args: { _code: string; _whatsapp: string }; Returns: Json }
     }
     Enums: {
