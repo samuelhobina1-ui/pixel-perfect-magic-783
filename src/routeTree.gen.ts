@@ -17,8 +17,11 @@ import { Route as ShopRouteImport } from './routes/shop'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
+import { Route as AdminRoomsRouteImport } from './routes/admin.rooms'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminSmsRouteImport } from './routes/admin.sms'
 import { Route as AdminStockRouteImport } from './routes/admin.stock'
+import { Route as ApiPublicOpaySmsRouteImport } from './routes/api/public/opay-sms'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -60,15 +63,30 @@ const AdminProductsRoute = AdminProductsRouteImport.update({
   path: '/products',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminRoomsRoute = AdminRoomsRouteImport.update({
+  id: '/rooms',
+  path: '/rooms',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSmsRoute = AdminSmsRouteImport.update({
+  id: '/sms',
+  path: '/sms',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminStockRoute = AdminStockRouteImport.update({
   id: '/stock',
   path: '/stock',
   getParentRoute: () => AdminRoute,
+} as any)
+const ApiPublicOpaySmsRoute = ApiPublicOpaySmsRouteImport.update({
+  id: '/api/public/opay-sms',
+  path: '/api/public/opay-sms',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -79,9 +97,12 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRoute
   '/track': typeof TrackRoute
   '/admin/products': typeof AdminProductsRoute
+  '/admin/rooms': typeof AdminRoomsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/sms': typeof AdminSmsRoute
   '/admin/stock': typeof AdminStockRoute
   '/admin/': typeof AdminIndexRoute
+  '/api/public/opay-sms': typeof ApiPublicOpaySmsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -90,9 +111,12 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRoute
   '/track': typeof TrackRoute
   '/admin/products': typeof AdminProductsRoute
+  '/admin/rooms': typeof AdminRoomsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/sms': typeof AdminSmsRoute
   '/admin/stock': typeof AdminStockRoute
   '/admin': typeof AdminIndexRoute
+  '/api/public/opay-sms': typeof ApiPublicOpaySmsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -103,9 +127,12 @@ export interface FileRoutesById {
   '/shop': typeof ShopRoute
   '/track': typeof TrackRoute
   '/admin/products': typeof AdminProductsRoute
+  '/admin/rooms': typeof AdminRoomsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/sms': typeof AdminSmsRoute
   '/admin/stock': typeof AdminStockRoute
   '/admin/': typeof AdminIndexRoute
+  '/api/public/opay-sms': typeof ApiPublicOpaySmsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -117,9 +144,12 @@ export interface FileRouteTypes {
     | '/shop'
     | '/track'
     | '/admin/products'
+    | '/admin/rooms'
     | '/admin/settings'
+    | '/admin/sms'
     | '/admin/stock'
     | '/admin/'
+    | '/api/public/opay-sms'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -128,9 +158,12 @@ export interface FileRouteTypes {
     | '/shop'
     | '/track'
     | '/admin/products'
+    | '/admin/rooms'
     | '/admin/settings'
+    | '/admin/sms'
     | '/admin/stock'
     | '/admin'
+    | '/api/public/opay-sms'
   id:
     | '__root__'
     | '/'
@@ -140,9 +173,12 @@ export interface FileRouteTypes {
     | '/shop'
     | '/track'
     | '/admin/products'
+    | '/admin/rooms'
     | '/admin/settings'
+    | '/admin/sms'
     | '/admin/stock'
     | '/admin/'
+    | '/api/public/opay-sms'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -152,6 +188,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   ShopRoute: typeof ShopRoute
   TrackRoute: typeof TrackRoute
+  ApiPublicOpaySmsRoute: typeof ApiPublicOpaySmsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -212,11 +249,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProductsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/rooms': {
+      id: '/admin/rooms'
+      path: '/rooms'
+      fullPath: '/admin/rooms'
+      preLoaderRoute: typeof AdminRoomsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
       fullPath: '/admin/settings'
       preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/sms': {
+      id: '/admin/sms'
+      path: '/sms'
+      fullPath: '/admin/sms'
+      preLoaderRoute: typeof AdminSmsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/stock': {
@@ -226,19 +277,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminStockRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/opay-sms': {
+      id: '/api/public/opay-sms'
+      path: '/api/public/opay-sms'
+      fullPath: '/api/public/opay-sms'
+      preLoaderRoute: typeof ApiPublicOpaySmsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AdminRouteChildren {
   AdminProductsRoute: typeof AdminProductsRoute
+  AdminRoomsRoute: typeof AdminRoomsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminSmsRoute: typeof AdminSmsRoute
   AdminStockRoute: typeof AdminStockRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminProductsRoute: AdminProductsRoute,
+  AdminRoomsRoute: AdminRoomsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminSmsRoute: AdminSmsRoute,
   AdminStockRoute: AdminStockRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
@@ -252,6 +314,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   ShopRoute: ShopRoute,
   TrackRoute: TrackRoute,
+  ApiPublicOpaySmsRoute: ApiPublicOpaySmsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
