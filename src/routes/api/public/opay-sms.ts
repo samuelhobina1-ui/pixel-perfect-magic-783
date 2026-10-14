@@ -14,7 +14,7 @@ export const Route = createFileRoute("/api/public/opay-sms")({
         let message = raw;
         try {
           const j = JSON.parse(raw) as Record<string, unknown>;
-          message = String(j.message ?? j.msg ?? j.text ?? j.body ?? j.content ?? raw);
+          message = String(j["message"] ?? j["msg"] ?? j["text"] ?? j["body"] ?? j["content"] ?? raw);
         } catch { /* plain text body */ }
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data, error } = await supabaseAdmin.rpc("ingest_opay_sms", { _token: token, _message: message });
