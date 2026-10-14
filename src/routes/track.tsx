@@ -22,7 +22,13 @@ export const Route = createFileRoute("/track")({
 
 type T = { order_code: string; product_name: string; price: number; status: string; pin?: string | null; created_at: string; reject_reason: string | null };
 type Local = { tracking_id: string; product: string; date: string; whatsapp?: string };
-const LABEL: Record<string, string> = { pending: "Pending verification", auto_approved: "Auto-Delivered", approved: "Delivered", rejected: "Rejected" };
+const LABEL: Record<string, string> = {
+  pending: "Waiting for OPay payment confirmation… make sure you entered the correct Transaction ID",
+  paid_waiting_manual: "✅ Payment confirmed from OPay. Your top-up is being done manually — you'll get a WhatsApp confirmation in 5–15 mins",
+  auto_approved: "✅ Payment verified — PIN delivered",
+  approved: "✅ Completed — check your game account",
+  rejected: "Rejected",
+};
 
 async function fetchOne(o: Local): Promise<T | null> {
   if (o.whatsapp) {
