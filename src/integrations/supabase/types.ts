@@ -44,6 +44,36 @@ export type Database = {
         }
         Relationships: []
       }
+      opay_sms_log: {
+        Row: {
+          amount: number
+          id: string
+          is_processed: boolean
+          raw_full_sms: string
+          received_at: string
+          sender_name: string | null
+          txn_id: string
+        }
+        Insert: {
+          amount: number
+          id?: string
+          is_processed?: boolean
+          raw_full_sms: string
+          received_at?: string
+          sender_name?: string | null
+          txn_id: string
+        }
+        Update: {
+          amount?: number
+          id?: string
+          is_processed?: boolean
+          raw_full_sms?: string
+          received_at?: string
+          sender_name?: string | null
+          txn_id?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           auto_checks: Json | null
@@ -66,6 +96,8 @@ export type Database = {
           status: string
           tracking_id: string | null
           transaction_id: string
+          verified_amount: number | null
+          verified_txn_id: string | null
         }
         Insert: {
           auto_checks?: Json | null
@@ -88,6 +120,8 @@ export type Database = {
           status?: string
           tracking_id?: string | null
           transaction_id: string
+          verified_amount?: number | null
+          verified_txn_id?: string | null
         }
         Update: {
           auto_checks?: Json | null
@@ -110,6 +144,8 @@ export type Database = {
           status?: string
           tracking_id?: string | null
           transaction_id?: string
+          verified_amount?: number | null
+          verified_txn_id?: string | null
         }
         Relationships: [
           {
@@ -133,6 +169,7 @@ export type Database = {
           created_at: string
           id: string
           is_used: boolean
+          order_id: string | null
           pin_code: string
           product_id: string
           used_at: string | null
@@ -141,6 +178,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_used?: boolean
+          order_id?: string | null
           pin_code: string
           product_id: string
           used_at?: string | null
@@ -149,6 +187,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_used?: boolean
+          order_id?: string | null
           pin_code?: string
           product_id?: string
           used_at?: string | null
@@ -207,6 +246,7 @@ export type Database = {
           created_at: string
           deleted_at: string | null
           description: string | null
+          fulfillment_type: string
           how_to_use: string | null
           id: string
           image_url: string | null
@@ -221,6 +261,7 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           description?: string | null
+          fulfillment_type?: string
           how_to_use?: string | null
           id?: string
           image_url?: string | null
@@ -235,6 +276,7 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           description?: string | null
+          fulfillment_type?: string
           how_to_use?: string | null
           id?: string
           image_url?: string | null
@@ -260,6 +302,7 @@ export type Database = {
           low_stock_threshold: number
           opay_name: string
           opay_number: string
+          sms_webhook_token: string
           whatsapp_number: string
           whatsapp_template: string
         }
@@ -269,6 +312,7 @@ export type Database = {
           low_stock_threshold?: number
           opay_name?: string
           opay_number?: string
+          sms_webhook_token?: string
           whatsapp_number?: string
           whatsapp_template?: string
         }
@@ -278,8 +322,30 @@ export type Database = {
           low_stock_threshold?: number
           opay_name?: string
           opay_number?: string
+          sms_webhook_token?: string
           whatsapp_number?: string
           whatsapp_template?: string
+        }
+        Relationships: []
+      }
+      used_transaction_ids: {
+        Row: {
+          customer_whatsapp: string | null
+          order_id: string | null
+          txn_id: string
+          used_at: string
+        }
+        Insert: {
+          customer_whatsapp?: string | null
+          order_id?: string | null
+          txn_id: string
+          used_at?: string
+        }
+        Update: {
+          customer_whatsapp?: string | null
+          order_id?: string | null
+          txn_id?: string
+          used_at?: string
         }
         Relationships: []
       }
@@ -325,6 +391,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      ingest_opay_sms: {
+        Args: { _message: string; _token: string }
+        Returns: Json
+      }
       place_order: {
         Args: {
           _player_id: string
@@ -338,6 +408,7 @@ export type Database = {
       }
       public_settings: { Args: never; Returns: Json }
       track_order: { Args: { _code: string; _whatsapp: string }; Returns: Json }
+      verify_order: { Args: { _order_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user"

@@ -43,6 +43,13 @@
       "when": 1791877378308,
       "tag": "0005_tracking_ids",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791969909237,
+      "tag": "0006_opay_sms_autoverify",
+      "breakpoints": true
     }
   ]
 }
