@@ -23,7 +23,7 @@ export function parseMoniepoint(text: string) {
   if (/debit/i.test(text) && !/credit/i.test(text)) return null;
   const m = text.match(/(?:₦|NGN|N)\s?([0-9]{1,3}(?:,[0-9]{3})*(?:\.\d{1,2})?|[0-9]+(?:\.\d{1,2})?)/i);
   if (!m) return null;
-  const amount = Number(m[1].replace(/,/g, ""));
+  const amount = Number((m[1] ?? "").replace(/,/g, ""));
   if (!amount) return null;
   const sender = text.match(/(?:from|sender(?:\s*name)?|by)\s*[:\-]?\s*([A-Z][A-Za-z.' ]{2,60}?)(?=\s{2,}|\s*(?:\||,|\.|\n|Account|Amount|Narration|on |Date|Ref|$))/i)?.[1]?.trim() ?? null;
   return { amount, sender };
