@@ -26,7 +26,7 @@ function Contact() {
           <Mail className="mb-2 h-6 w-6 text-primary" /><p className="font-semibold">Email</p><p className="break-all text-sm text-muted-foreground">Samuelhobina1@gmail.com</p>
         </a>
         <div className="card-glow p-5">
-          <Wallet className="mb-2 h-6 w-6 text-accent" /><p className="font-semibold">OPay</p><p className="text-sm text-muted-foreground">9045001199 · Samuel Kingsley</p>
+          <Wallet className="mb-2 h-6 w-6 text-accent" /><p className="font-semibold">Moniepoint MFB</p><p className="text-sm text-muted-foreground">9045001199 · Samuel Kingsley</p>
         </div>
       </div>
     </main>

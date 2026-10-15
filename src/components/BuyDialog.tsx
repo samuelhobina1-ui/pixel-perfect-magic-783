@@ -93,7 +93,7 @@ export function BuyDialog({ product, onClose }: { product: PublicProduct | null;
                 ? "✅ Payment confirmed! Your top-up will be done manually within 5–15 mins. We'll confirm on WhatsApp."
                 : result.status === "rejected"
                   ? `Order rejected: ${(result as Result & { reject_reason?: string }).reject_reason ?? "please contact support"}`
-                  : "Waiting for OPay payment confirmation. This usually takes a minute — check My Orders."}</p>
+                  : "Waiting for Moniepoint payment confirmation. This usually takes a minute — check My Orders."}</p>
             )}
             <Button variant="outline" asChild><Link to="/track" onClick={close}>My Orders</Link></Button>
           </div>

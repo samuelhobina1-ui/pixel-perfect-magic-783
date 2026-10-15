@@ -10,9 +10,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "ZENTRA GAMING HUB — Libyana, PUBG, CODM, Free Fire top-ups in Naira" },
-      { name: "description", content: "Buy Libyana, Almadar, LTT data, CODM CP, PUBG UC, Free Fire diamonds and TikTok coins. Pay in Naira via OPay." },
+      { name: "description", content: "Buy Libyana, Almadar, LTT data, CODM CP, PUBG UC, Free Fire diamonds and TikTok coins. Pay in Naira via Moniepoint." },
       { property: "og:title", content: "ZENTRA GAMING HUB" },
-      { property: "og:description", content: "Recharge cards and game top-ups, paid in Naira via OPay." },
+      { property: "og:description", content: "Recharge cards and game top-ups, paid in Naira via Moniepoint." },
     ],
   }),
   loader: ({ context }) => Promise.all([
@@ -34,7 +34,7 @@ function Index() {
           <h1 className="max-w-2xl text-4xl font-bold leading-tight md:text-6xl">
             Top up <span className="text-primary">instantly</span>. Play <span className="text-accent">harder</span>.
           </h1>
-          <p className="mt-4 max-w-lg text-muted-foreground">Libyana, Almadar, LTT, CODM, PUBG, Free Fire & TikTok — pay in Naira with OPay.</p>
+          <p className="mt-4 max-w-lg text-muted-foreground">Libyana, Almadar, LTT, CODM, PUBG, Free Fire & TikTok — pay in Naira with Moniepoint.</p>
           <div className="mt-8 flex gap-3">
             <Button asChild size="lg"><Link to="/shop">Shop now</Link></Button>
             <Button asChild size="lg" variant="outline"><Link to="/track">Track order</Link></Button>
@@ -42,7 +42,7 @@ function Index() {
         </div>
       </section>
       <section className="mx-auto grid max-w-6xl grid-cols-3 gap-3 px-4 py-8 text-center text-xs md:text-sm">
-        {[[Zap, "Fast delivery"], [Wallet, "OPay · Naira"], [ShieldCheck, "Verified PINs"]].map(([I, t]) => {
+        {[[Zap, "Fast delivery"], [Wallet, "Moniepoint · Naira"], [ShieldCheck, "Verified PINs"]].map(([I, t]) => {
           const Icon = I as typeof Zap;
           return <div key={t as string} className="card-glow p-4"><Icon className="mx-auto mb-2 h-6 w-6 text-primary" />{t as string}</div>;
         })}

@@ -2,21 +2,34 @@ import { createFileRoute } from "@tanstack/react-router";
 import { authenticateCronRequest } from "@/integrations/supabase/cron-auth";
 
 const GW = "https://connector-gateway.lovable.dev/google_mail/gmail/v1/users/me";
-const Q = "is:unread newer_than:2d (subject:opay OR from:noreply) NGN TxnID";
+const Q =
+  'is:unread newer_than:2d from:(alerts@moniepoint.com OR no-reply@moniepoint.com OR noreply@moniepoint.com) ' +
+  '("Credit Alert" OR "You have received" OR "Payment Received" OR "Transaction Alert - Credit" OR credit)';
 
 function decode(s: string) {
   const b = atob(s.replace(/-/g, "+").replace(/_/g, "/"));
   return new TextDecoder().decode(Uint8Array.from(b, (c) => c.charCodeAt(0)));
 }
-type Part = { mimeType?: string; body?: { data?: string }; parts?: Part[] };
+type Part = { mimeType?: string; body?: { data?: string }; parts?: Part[]; headers?: { name: string; value: string }[] };
 function bodyText(p: Part): string {
   if (p.mimeType === "text/plain" && p.body?.data) return decode(p.body.data);
   for (const c of p.parts ?? []) { const t = bodyText(c); if (t) return t; }
-  if (p.body?.data) return decode(p.body.data).replace(/<[^>]+>/g, " ");
+  if (p.body?.data) return decode(p.body.data).replace(/<[^>]+>/g, " ").replace(/&nbsp;|&#8358;/g, (m) => (m === "&nbsp;" ? " " : "₦"));
   return "";
 }
 
-// Polls the owner's Gmail for forwarded OPay SMS and feeds them into the same matcher as the SMS webhook.
+// Parses a Moniepoint credit alert. Exported for tests.
+export function parseMoniepoint(text: string) {
+  if (/debit/i.test(text) && !/credit/i.test(text)) return null;
+  const m = text.match(/(?:₦|NGN|N)\s?([0-9]{1,3}(?:,[0-9]{3})*(?:\.\d{1,2})?|[0-9]+(?:\.\d{1,2})?)/i);
+  if (!m) return null;
+  const amount = Number(m[1].replace(/,/g, ""));
+  if (!amount) return null;
+  const sender = text.match(/(?:from|sender(?:\s*name)?|by)\s*[:\-]?\s*([A-Z][A-Za-z.' ]{2,60}?)(?=\s{2,}|\s*(?:\||,|\.|\n|Account|Amount|Narration|on |Date|Ref|$))/i)?.[1]?.trim() ?? null;
+  return { amount, sender };
+}
+
+// Polls the owner's Gmail every minute for Moniepoint credit alerts and auto-confirms the matching pending order.
 export const Route = createFileRoute("/api/public/jobs/gmail-opay")({
   server: {
     handlers: {
@@ -30,18 +43,22 @@ export const Route = createFileRoute("/api/public/jobs/gmail-opay")({
         if (!list.ok) { const t = await list.text(); console.error(`Gmail list [${list.status}]: ${t}`); return new Response(t, { status: 502 }); }
         const ids = ((await list.json()) as { messages?: { id: string }[] }).messages ?? [];
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data: s } = await supabaseAdmin.from("settings").select("sms_webhook_token").eq("id", 1).single();
         const results = [];
         for (const { id } of ids) {
           const r = await fetch(`${GW}/messages/${id}?format=full`, { headers: h });
           if (!r.ok) { console.error(`Gmail get [${r.status}]: ${await r.text()}`); continue; }
           const m = (await r.json()) as { payload: Part; snippet?: string };
-          const text = (bodyText(m.payload) || m.snippet || "").replace(/\s+/g, " ").slice(0, 2000);
-          const { data, error } = await supabaseAdmin.rpc("ingest_opay_sms", { _token: s?.sms_webhook_token ?? "", _message: text });
-          const parsed = (data as { parsed?: { txn_id: string } } | null)?.parsed;
-          if (parsed) await supabaseAdmin.from("opay_sms_log").update({ source: "gmail" }).eq("txn_id", parsed.txn_id);
-          console.log("[gmail-opay]", id, error?.message ?? JSON.stringify(data));
-          results.push({ id, result: error ? error.message : data });
+          const from = m.payload.headers?.find((x) => x.name.toLowerCase() === "from")?.value ?? "";
+          const subject = m.payload.headers?.find((x) => x.name.toLowerCase() === "subject")?.value ?? "";
+          const text = `${subject} ${bodyText(m.payload) || m.snippet || ""}`.replace(/\s+/g, " ").slice(0, 2000);
+          const p = /@moniepoint\.com>?\s*$/i.test(from) ? parseMoniepoint(text) : null;
+          let result: unknown = "skipped: not a Moniepoint credit alert";
+          if (p) {
+            const { data, error } = await supabaseAdmin.rpc("ingest_bank_alert", { _ref: `MP-${id}`, _amount: p.amount, _sender: p.sender ?? "", _message: text });
+            result = error ? error.message : data;
+          }
+          console.log("[gmail-moniepoint]", id, from, JSON.stringify(p), JSON.stringify(result));
+          results.push({ id, parsed: p, result });
           await fetch(`${GW}/messages/${id}/modify`, { method: "POST", headers: { ...h, "Content-Type": "application/json" }, body: JSON.stringify({ removeLabelIds: ["UNREAD"] }) });
         }
         return Response.json({ checked: ids.length, results });
