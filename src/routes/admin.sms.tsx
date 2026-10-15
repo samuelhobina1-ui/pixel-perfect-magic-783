@@ -42,7 +42,7 @@ function Sms() {
           <tbody>{list.map((r) => (
             <tr key={r.id} className="border-t border-border align-top">
               <td className="p-2 font-mono"><button onClick={() => copy(r.txn_id)} className="hover:text-primary">{r.txn_id} 📋</button></td>
-              <td>{naira(r.amount)}</td><td>{r.sender_name}</td>
+              <td>{naira(r.amount)}</td><td>{r.sender_name}<br /><span className="text-xs text-muted-foreground">{r.source === "gmail" ? "📧 Gmail" : "📱 SMS"}</span></td>
               <td className="max-w-xs text-xs text-muted-foreground">{r.raw_full_sms}</td>
               <td className="whitespace-nowrap">{new Date(r.received_at).toLocaleString()}</td>
               <td>{r.is_processed ? <span className="text-primary">Yes</span> : <span className="text-warning">No</span>}</td>
