@@ -18,9 +18,9 @@ export const Route = createFileRoute("/$slug")({
     return {
       meta: n ? [
         { title: `Buy ${n} — ZENTRA GAMING HUB` },
-        { name: "description", content: `Buy ${n} instantly. Pay in Naira via OPay.` },
+        { name: "description", content: `Buy ${n} instantly. Pay in Naira via Moniepoint.` },
         { property: "og:title", content: `${n} — ZENTRA GAMING HUB` },
-        { property: "og:description", content: `${n} top-ups paid in Naira via OPay.` },
+        { property: "og:description", content: `${n} top-ups paid in Naira via Moniepoint.` },
       ] : [{ title: "Unavailable — ZENTRA GAMING HUB" }, { name: "robots", content: "noindex" }],
     };
   },

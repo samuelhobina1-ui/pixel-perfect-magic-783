@@ -55,11 +55,11 @@ export function Footer() {
       <div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 text-sm text-muted-foreground md:grid-cols-3">
         <div>
           <p className="font-display text-base font-bold"><span className="text-primary">ZENTRA</span> <span className="text-accent">GAMING HUB</span></p>
-          <p className="mt-2">Libyana, Almadar, LTT recharge & game top-ups. Paid in Naira via OPay.</p>
+          <p className="mt-2">Libyana, Almadar, LTT recharge & game top-ups. Paid in Naira via Moniepoint.</p>
         </div>
         <div>
-          <p className="font-semibold text-foreground">Pay with OPay</p>
-          <p className="mt-2">9045001199 · Samuel Kingsley</p>
+          <p className="font-semibold text-foreground">Pay with Moniepoint MFB</p>
+          <p className="mt-2">Moniepoint MFB · 9045001199 · Samuel Kingsley</p>
           <p>Naira (₦) only</p>
         </div>
         <div>

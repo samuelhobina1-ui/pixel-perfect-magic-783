@@ -394,6 +394,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      ingest_bank_alert: {
+        Args: {
+          _amount: number
+          _message: string
+          _ref: string
+          _sender: string
+        }
+        Returns: Json
+      }
       ingest_opay_sms: {
         Args: { _message: string; _token: string }
         Returns: Json

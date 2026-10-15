@@ -52,8 +52,8 @@ function SettingsPage() {
           <Switch checked={s.auto_mode} onCheckedChange={(v) => setS({ ...s, auto_mode: v })} />
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <div><Label>OPay number</Label><Input value={s.opay_number} onChange={(e) => setS({ ...s, opay_number: e.target.value })} /></div>
-          <div><Label>OPay name</Label><Input value={s.opay_name} onChange={(e) => setS({ ...s, opay_name: e.target.value })} /></div>
+          <div><Label>Moniepoint account number</Label><Input value={s.opay_number} onChange={(e) => setS({ ...s, opay_number: e.target.value })} /></div>
+          <div><Label>Account name</Label><Input value={s.opay_name} onChange={(e) => setS({ ...s, opay_name: e.target.value })} /></div>
           <div><Label>Support WhatsApp</Label><Input value={s.whatsapp_number} onChange={(e) => setS({ ...s, whatsapp_number: e.target.value })} /></div>
           <div><Label>Low stock alert at</Label><Input type="number" value={s.low_stock_threshold} onChange={(e) => setS({ ...s, low_stock_threshold: Number(e.target.value) })} /></div>
         </div>
