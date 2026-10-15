@@ -57,6 +57,13 @@
       "when": 1792056230010,
       "tag": "0007_opay_sms_source",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792073015033,
+      "tag": "0008_moniepoint_alerts",
+      "breakpoints": true
     }
   ]
 }
