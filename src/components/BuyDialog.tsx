@@ -101,8 +101,10 @@ export function BuyDialog({ product, onClose }: { product: PublicProduct | null;
           <form onSubmit={submit} className="space-y-4">
             <div className="rounded-lg border border-primary/40 bg-primary/10 p-3 text-sm">
               <p>Pay <b className="text-lg text-primary">EXACTLY {naira(product.price_naira)}</b> to:</p>
-              <p className="mt-1 font-semibold">OPay {settings?.opay_number ?? "9045001199"}</p>
+              <p className="mt-1 font-semibold">Moniepoint MFB · {settings?.opay_number ?? "9045001199"}
+                <button type="button" className="ml-2 rounded border border-primary/50 px-2 text-xs text-primary" onClick={() => { navigator.clipboard.writeText(settings?.opay_number ?? "9045001199"); toast.success("Account number copied"); }}>Copy</button></p>
               <p>{settings?.opay_name ?? "Samuel Kingsley"}</p>
+              <p className="mt-1 text-xs text-muted-foreground">Pay the exact amount — your order confirms automatically within a few minutes.</p>
             </div>
             {product.how_to_use && <p className="text-xs text-muted-foreground">{product.how_to_use}</p>}
             <div className="space-y-1"><Label>{field.label}</Label><Input required pattern={field.pattern} title={field.title} placeholder={field.ph} value={playerId} onChange={(e) => setPlayerId(e.target.value)} /></div>
