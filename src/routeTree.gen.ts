@@ -22,6 +22,7 @@ import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminSmsRouteImport } from './routes/admin.sms'
 import { Route as AdminStockRouteImport } from './routes/admin.stock'
 import { Route as ApiPublicOpaySmsRouteImport } from './routes/api/public/opay-sms'
+import { Route as ApiPublicJobsGmailOpayRouteImport } from './routes/api/public/jobs/gmail-opay'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -88,6 +89,11 @@ const ApiPublicOpaySmsRoute = ApiPublicOpaySmsRouteImport.update({
   path: '/api/public/opay-sms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicJobsGmailOpayRoute = ApiPublicJobsGmailOpayRouteImport.update({
+  id: '/api/public/jobs/gmail-opay',
+  path: '/api/public/jobs/gmail-opay',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/admin/stock': typeof AdminStockRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/opay-sms': typeof ApiPublicOpaySmsRoute
+  '/api/public/jobs/gmail-opay': typeof ApiPublicJobsGmailOpayRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/admin/stock': typeof AdminStockRoute
   '/admin': typeof AdminIndexRoute
   '/api/public/opay-sms': typeof ApiPublicOpaySmsRoute
+  '/api/public/jobs/gmail-opay': typeof ApiPublicJobsGmailOpayRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/admin/stock': typeof AdminStockRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/opay-sms': typeof ApiPublicOpaySmsRoute
+  '/api/public/jobs/gmail-opay': typeof ApiPublicJobsGmailOpayRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -150,6 +159,7 @@ export interface FileRouteTypes {
     | '/admin/stock'
     | '/admin/'
     | '/api/public/opay-sms'
+    | '/api/public/jobs/gmail-opay'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
     | '/admin/stock'
     | '/admin'
     | '/api/public/opay-sms'
+    | '/api/public/jobs/gmail-opay'
   id:
     | '__root__'
     | '/'
@@ -179,6 +190,7 @@ export interface FileRouteTypes {
     | '/admin/stock'
     | '/admin/'
     | '/api/public/opay-sms'
+    | '/api/public/jobs/gmail-opay'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -189,6 +201,7 @@ export interface RootRouteChildren {
   ShopRoute: typeof ShopRoute
   TrackRoute: typeof TrackRoute
   ApiPublicOpaySmsRoute: typeof ApiPublicOpaySmsRoute
+  ApiPublicJobsGmailOpayRoute: typeof ApiPublicJobsGmailOpayRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -284,6 +297,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicOpaySmsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/jobs/gmail-opay': {
+      id: '/api/public/jobs/gmail-opay'
+      path: '/api/public/jobs/gmail-opay'
+      fullPath: '/api/public/jobs/gmail-opay'
+      preLoaderRoute: typeof ApiPublicJobsGmailOpayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -315,6 +335,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopRoute: ShopRoute,
   TrackRoute: TrackRoute,
   ApiPublicOpaySmsRoute: ApiPublicOpaySmsRoute,
+  ApiPublicJobsGmailOpayRoute: ApiPublicJobsGmailOpayRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
