@@ -52,6 +52,7 @@ export type Database = {
           raw_full_sms: string
           received_at: string
           sender_name: string | null
+          source: string
           txn_id: string
         }
         Insert: {
@@ -61,6 +62,7 @@ export type Database = {
           raw_full_sms: string
           received_at?: string
           sender_name?: string | null
+          source?: string
           txn_id: string
         }
         Update: {
@@ -70,6 +72,7 @@ export type Database = {
           raw_full_sms?: string
           received_at?: string
           sender_name?: string | null
+          source?: string
           txn_id?: string
         }
         Relationships: []
