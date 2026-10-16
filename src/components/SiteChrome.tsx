@@ -59,7 +59,7 @@ export function Footer() {
         </div>
         <div>
           <p className="font-semibold text-foreground">Pay with Moniepoint MFB</p>
-          <p className="mt-2">Moniepoint MFB · 9045001199 · Samuel Kingsley</p>
+          <p className="mt-2">Moniepoint MFB · 5339964934 · HOBINA KINGSLEY SAMUEL</p>
           <p>Naira (₦) only</p>
         </div>
         <div>
