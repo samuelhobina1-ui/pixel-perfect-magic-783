@@ -31,6 +31,7 @@ function Dashboard() {
   const [q, setQ] = useState("");
   const filt = (o: Order) => !q || [o.order_code, o.product_name, o.customer_whatsapp, o.player_id, o.transaction_id, o.category].join(" ").toLowerCase().includes(q.toLowerCase());
   const pending = orders.filter((o) => o.status === "pending").filter(filt);
+  const verified = orders.filter((o) => o.status === "paid_waiting_manual").filter(filt);
   const sold = orders.filter((o) => o.status === "approved" || o.status === "auto_approved").filter(filt);
   const rejected = orders.filter((o) => o.status === "rejected").filter(filt);
   const today = new Date().toDateString();
@@ -47,6 +48,13 @@ function Dashboard() {
     const { data, error } = await supabase.rpc("approve_order", { _order_id: o.id });
     if (error) { toast.error(error.message); return; }
     toast.success("Approved"); sendWa(o, data as string); reload();
+  }
+  async function markDone(o: Order) {
+    const { error } = await supabase.from("orders").update({ status: "approved", delivery_mode: "manual", delivered_at: new Date().toISOString() }).eq("id", o.id);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Marked as topped up");
+    if (settings) window.open(waLink(o.customer_whatsapp, `✅ ZENTRA GAMING HUB\nOrder ${o.tracking_id ?? o.order_code}: ${o.product_name} has been topped up to ${o.player_id}. Thank you!`), "_blank");
+    reload();
   }
   async function reject(o: Order) {
     const reason = prompt("Reason for rejection?"); if (reason === null) return;
@@ -90,8 +98,9 @@ function Dashboard() {
       </div>
       <Tabs defaultValue="pending">
         <TabsList>
-          <TabsTrigger value="pending">Waiting ({pending.length})</TabsTrigger>
-          <TabsTrigger value="sold">Sold ({sold.length})</TabsTrigger>
+          <TabsTrigger value="pending">Pending ({pending.length})</TabsTrigger>
+          <TabsTrigger value="verified">Zentra Verified ({verified.length})</TabsTrigger>
+          <TabsTrigger value="sold">Approved & Auto-Sent ({sold.length})</TabsTrigger>
           <TabsTrigger value="rejected">Rejected ({rejected.length})</TabsTrigger>
         </TabsList>
         <TabsContent value="pending" className="overflow-x-auto rounded-lg border border-warning/40">
@@ -114,6 +123,27 @@ function Dashboard() {
               );
             })}</tbody></table>
           {!pending.length && <p className="p-6 text-center text-muted-foreground">No pending orders.</p>}
+        </TabsContent>
+        <TabsContent value="verified" className="overflow-x-auto rounded-lg border border-accent/40">
+          <p className="p-3 text-xs text-muted-foreground">Payment confirmed by the bank alert — deliver the PIN or top-up now.</p>
+          <table className="w-full"><thead><tr>{["Order", "Paid", "Product", "Price", "WhatsApp", "Player ID", "Bank ref", "Action"].map((h) => <th key={h} className={th}>{h}</th>)}</tr></thead>
+            <tbody>{verified.map((o) => (
+              <tr key={o.id} className="border-t border-border">
+                <td className={`${td} font-mono text-accent`}>{o.tracking_id ?? o.order_code}</td>
+                <td className={td}>{new Date(o.created_at).toLocaleString()}</td>
+                <td className={td}>{o.product_name}<div className="text-xs text-muted-foreground">{o.category}</div></td>
+                <td className={`${td} font-bold text-primary`}>{naira(o.verified_amount ?? o.price)}</td>
+                <td className={td}><a className="text-primary underline" href={waLink(o.customer_whatsapp)} target="_blank" rel="noreferrer">{o.customer_whatsapp}</a></td>
+                <td className={`${td} font-mono`}>{o.player_id}</td>
+                <td className={`${td} font-mono`}>{o.verified_txn_id}</td>
+                <td className={`${td} space-x-1`}>
+                  <Button size="sm" onClick={() => approve(o)}>Send PIN</Button>
+                  <Button size="sm" variant="outline" onClick={() => markDone(o)}>Mark topped up</Button>
+                  <Button size="sm" variant="destructive" onClick={() => reject(o)}>Reject</Button>
+                </td>
+              </tr>
+            ))}</tbody></table>
+          {!verified.length && <p className="p-6 text-center text-muted-foreground">Nothing waiting for delivery.</p>}
         </TabsContent>
         <TabsContent value="sold" className="space-y-2">
           <div className="flex items-center justify-between text-sm">
