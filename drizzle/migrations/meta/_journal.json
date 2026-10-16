@@ -64,6 +64,13 @@
       "when": 1792073015033,
       "tag": "0008_moniepoint_alerts",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792110517564,
+      "tag": "0009_exact_fifo_bank_match",
+      "breakpoints": true
     }
   ]
 }
