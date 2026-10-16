@@ -18,15 +18,19 @@ function bodyText(p: Part): string {
   return "";
 }
 
-// Parses a Moniepoint credit alert. Exported for tests.
-export function parseMoniepoint(text: string) {
+export const ACCOUNT = "5339964934";
+
+// Parses a Moniepoint credit alert. Rejects alerts naming a different account. Exported for tests.
+export function parseMoniepoint(text: string, account = ACCOUNT) {
   if (/debit/i.test(text) && !/credit/i.test(text)) return null;
-  const m = text.match(/(?:₦|NGN|N)\s?([0-9]{1,3}(?:,[0-9]{3})*(?:\.\d{1,2})?|[0-9]+(?:\.\d{1,2})?)/i);
+  const acct = text.match(/Account\s*(?:Number|No\.?)?\s*[:\-]?\s*(\d{10})/i)?.[1];
+  if (acct && acct !== account) return null;
+  const m = text.match(/(?:Credit\s*Amount\s*[:\-]?\s*)?(?:₦|NGN)\s?([0-9]{1,3}(?:,[0-9]{3})*(?:\.\d{1,2})?|[0-9]+(?:\.\d{1,2})?)/i);
   if (!m) return null;
   const amount = Number((m[1] ?? "").replace(/,/g, ""));
   if (!amount) return null;
-  const sender = text.match(/(?:from|sender(?:\s*name)?|by)\s*[:\-]?\s*([A-Z][A-Za-z.' ]{2,60}?)(?=\s{2,}|\s*(?:\||,|\.|\n|Account|Amount|Narration|on |Date|Ref|$))/i)?.[1]?.trim() ?? null;
-  return { amount, sender };
+  const sender = text.match(/(?:from|sender(?:'|’)?s?(?:\s*name)?|by)\s*[:\-]?\s*(?:from\s+)?([A-Z][A-Za-z.' ]{2,60}?)(?=\s{2,}|\s*(?:\||,|\.|\n|Account|Amount|Narration|on |Date|Ref|$))/i)?.[1]?.trim() ?? null;
+  return { amount, sender, account: acct ?? null };
 }
 
 // Polls the owner's Gmail every minute for Moniepoint credit alerts and auto-confirms the matching pending order.
