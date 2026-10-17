@@ -44,6 +44,21 @@ export type Database = {
         }
         Relationships: []
       }
+      lyd_naira_map: {
+        Row: {
+          lyd_amount: number
+          naira_amount: number
+        }
+        Insert: {
+          lyd_amount: number
+          naira_amount: number
+        }
+        Update: {
+          lyd_amount?: number
+          naira_amount?: number
+        }
+        Relationships: []
+      }
       opay_sms_log: {
         Row: {
           amount: number
@@ -88,6 +103,8 @@ export type Database = {
           delivery_mode: string | null
           id: string
           order_code: string
+          order_lyd_amount: number | null
+          order_naira_amount: number | null
           pin_delivered: string | null
           player_id: string
           price: number
@@ -112,6 +129,8 @@ export type Database = {
           delivery_mode?: string | null
           id?: string
           order_code: string
+          order_lyd_amount?: number | null
+          order_naira_amount?: number | null
           pin_delivered?: string | null
           player_id: string
           price: number
@@ -136,6 +155,8 @@ export type Database = {
           delivery_mode?: string | null
           id?: string
           order_code?: string
+          order_lyd_amount?: number | null
+          order_naira_amount?: number | null
           pin_delivered?: string | null
           player_id?: string
           price?: number
@@ -302,6 +323,9 @@ export type Database = {
         Row: {
           auto_mode: boolean
           id: number
+          last_gmail_found: number
+          last_gmail_note: string | null
+          last_gmail_poll_at: string | null
           low_stock_threshold: number
           opay_name: string
           opay_number: string
@@ -312,6 +336,9 @@ export type Database = {
         Insert: {
           auto_mode?: boolean
           id?: number
+          last_gmail_found?: number
+          last_gmail_note?: string | null
+          last_gmail_poll_at?: string | null
           low_stock_threshold?: number
           opay_name?: string
           opay_number?: string
@@ -322,6 +349,9 @@ export type Database = {
         Update: {
           auto_mode?: boolean
           id?: number
+          last_gmail_found?: number
+          last_gmail_note?: string | null
+          last_gmail_poll_at?: string | null
           low_stock_threshold?: number
           opay_name?: string
           opay_number?: string

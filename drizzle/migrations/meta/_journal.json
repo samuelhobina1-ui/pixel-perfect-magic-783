@@ -71,6 +71,13 @@
       "when": 1792110517564,
       "tag": "0009_exact_fifo_bank_match",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792215761222,
+      "tag": "0010_lyd_naira_map",
+      "breakpoints": true
     }
   ]
 }
