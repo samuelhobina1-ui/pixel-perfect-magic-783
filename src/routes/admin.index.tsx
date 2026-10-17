@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fillTemplate, naira, settingsQuery, waLink } from "@/lib/store";
 import type { Tables } from "@/integrations/supabase/types";
+import { checkGmailNow } from "@/lib/gmail-poll.functions";
 
 export const Route = createFileRoute("/admin/")({ component: Dashboard });
 
@@ -29,6 +30,12 @@ function Dashboard() {
     queryFn: async () => (await supabase.from("product_stock").select("*")).data ?? [],
   });
   const [q, setQ] = useState("");
+  const [polling, setPolling] = useState(false);
+  async function pollNow() {
+    setPolling(true);
+    try { const r = await checkGmailNow(); toast.success(`Found ${r.found} alerts${r.matched.length ? ` · matched ${r.matched.join(", ")}` : ""}`); qc.invalidateQueries({ queryKey: ["settings"] }); reload(); }
+    catch (e) { toast.error(String((e as Error).message ?? e)); } finally { setPolling(false); }
+  }
   const filt = (o: Order) => !q || [o.order_code, o.product_name, o.customer_whatsapp, o.player_id, o.transaction_id, o.category].join(" ").toLowerCase().includes(q.toLowerCase());
   const pending = orders.filter((o) => o.status === "pending").filter(filt);
   const verified = orders.filter((o) => o.status === "paid_waiting_manual").filter(filt);
@@ -104,6 +111,10 @@ function Dashboard() {
           <TabsTrigger value="rejected">Rejected ({rejected.length})</TabsTrigger>
         </TabsList>
         <TabsContent value="pending" className="overflow-x-auto rounded-lg border border-warning/40">
+          <div className="flex flex-wrap items-center gap-2 p-3 text-xs text-muted-foreground">
+            <span>Last Gmail poll: {settings?.last_gmail_poll_at ? new Date(settings.last_gmail_poll_at).toLocaleString() : "never"} - Found {settings?.last_gmail_found ?? 0} alerts for 5339964934 - Naira map: 5LYD=900{settings?.last_gmail_note ? ` - ${settings.last_gmail_note}` : ""}</span>
+            <Button size="sm" variant="outline" disabled={polling} onClick={pollNow}><RefreshCw className={`mr-1 h-3 w-3 ${polling ? "animate-spin" : ""}`} />Check Gmail now</Button>
+          </div>
           <table className="w-full"><thead><tr>{["Order", "Date", "Product", "Price", "WhatsApp", "Player ID", "Receipt", "Txn ID", "Checks", "Action"].map((h) => <th key={h} className={th}>{h}</th>)}</tr></thead>
             <tbody>{pending.map((o) => {
               const old = Date.now() - new Date(o.created_at).getTime() > 3600_000;

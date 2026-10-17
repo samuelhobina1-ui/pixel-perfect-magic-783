@@ -50,7 +50,7 @@ function AdminLayout() {
           <Link to="/admin/products" className={nav} activeProps={{ className: "text-primary bg-secondary" }}><Package className="h-4 w-4" />Products</Link>
           <Link to="/admin/stock" className={nav} activeProps={{ className: "text-primary bg-secondary" }}><Boxes className="h-4 w-4" />Stock</Link>
           <Link to="/admin/rooms" className={nav} activeProps={{ className: "text-primary bg-secondary" }}>🎮 Manual top-ups</Link>
-          <Link to="/admin/sms" className={nav} activeProps={{ className: "text-primary bg-secondary" }}>💬 OPay SMS</Link>
+          <Link to="/admin/sms" className={nav} activeProps={{ className: "text-primary bg-secondary" }}>🏦 Moniepoint alerts</Link>
           <Link to="/admin/settings" className={nav} activeProps={{ className: "text-primary bg-secondary" }}><Settings className="h-4 w-4" />Settings</Link>
           <button className={`${nav} ml-auto`} onClick={() => supabase.auth.signOut()}><LogOut className="h-4 w-4" />Sign out</button>
         </div>
