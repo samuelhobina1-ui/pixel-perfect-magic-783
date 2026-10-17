@@ -12,6 +12,7 @@ export type PublicProduct = {
 export type Settings = {
   auto_mode: boolean; opay_number: string; opay_name: string; whatsapp_number: string;
   whatsapp_template: string; low_stock_threshold: number;
+  last_gmail_poll_at?: string | null; last_gmail_found?: number; last_gmail_note?: string | null;
 };
 
 export const naira = (n: number) => "₦" + Number(n).toLocaleString("en-NG");
