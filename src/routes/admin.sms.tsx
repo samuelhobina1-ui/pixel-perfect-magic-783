@@ -35,7 +35,7 @@ function Sms() {
         <p className="text-xs text-muted-foreground">Keep this link private — anyone with it could add fake payments. Use your published site address, not the preview.</p>
         <div className="flex gap-2"><Input readOnly value={hook} className="font-mono text-xs" /><Button size="sm" onClick={() => copy(hook)}>Copy</Button></div>
       </section>
-      <div className="flex items-center gap-2"><h1 className="text-2xl font-bold">OPay SMS log</h1><Input className="ml-auto max-w-xs" placeholder="Search TxnID" value={q} onChange={(e) => setQ(e.target.value)} /></div>
+      <div className="flex items-center gap-2"><h1 className="text-2xl font-bold">Moniepoint alerts log</h1><Input className="ml-auto max-w-xs" placeholder="Search TxnID" value={q} onChange={(e) => setQ(e.target.value)} /></div>
       <div className="overflow-x-auto rounded-lg border border-border">
         <table className="w-full text-sm">
           <thead className="bg-secondary text-left"><tr><th className="p-2">TxnID</th><th>Amount</th><th>Sender</th><th>Full SMS</th><th>Time</th><th>Used?</th></tr></thead>
