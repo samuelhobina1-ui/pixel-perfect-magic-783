@@ -12,7 +12,7 @@ export function parseMoniepoint(text: string, account = ACCOUNT) {
     t.match(/Credit\s*Amount\s*[:\-]?\s*(?:₦|NGN|N)?\s?([0-9][0-9,]*(?:\.\d{1,2})?)/i) ??
     t.match(/(?:₦|NGN)\s?([0-9][0-9,]*(?:\.\d{1,2})?)/i);
   if (!m) return null;
-  const [whole, frac = ""] = m[1].replace(/,/g, "").split(".");
+  const [whole = "0", frac = ""] = (m[1] ?? "").replace(/,/g, "").split(".");
   const kobo = Number(whole) * 100 + Number((frac + "00").slice(0, 2));
   if (!kobo) return null;
   const sender = t.match(/Sender(?:'|’)?s?\s*Name\s*[:\-]?\s*(?:from\s+)?([A-Za-z.' ]{2,60}?)(?=\s+(?:Date|Narration|Account|$))/i)?.[1]?.trim() ?? null;
