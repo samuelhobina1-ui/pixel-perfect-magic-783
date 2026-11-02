@@ -92,6 +92,36 @@ export type Database = {
         }
         Relationships: []
       }
+      order_review_history: {
+        Row: {
+          action: string
+          admin_user_id: string
+          created_at: string
+          id: string
+          order_id: string | null
+          reason: string
+          tracking_id: string
+        }
+        Insert: {
+          action: string
+          admin_user_id: string
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          reason: string
+          tracking_id: string
+        }
+        Update: {
+          action?: string
+          admin_user_id?: string
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          reason?: string
+          tracking_id?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           auto_checks: Json | null
@@ -99,6 +129,7 @@ export type Database = {
           cost_price: number
           created_at: string
           customer_whatsapp: string
+          deleted_at: string | null
           delivered_at: string | null
           delivery_mode: string | null
           id: string
@@ -112,6 +143,7 @@ export type Database = {
           product_name: string
           receipt_hash: string | null
           receipt_image_url: string
+          refund_status: string | null
           reject_reason: string | null
           status: string
           tracking_id: string | null
@@ -125,6 +157,7 @@ export type Database = {
           cost_price?: number
           created_at?: string
           customer_whatsapp: string
+          deleted_at?: string | null
           delivered_at?: string | null
           delivery_mode?: string | null
           id?: string
@@ -138,6 +171,7 @@ export type Database = {
           product_name: string
           receipt_hash?: string | null
           receipt_image_url: string
+          refund_status?: string | null
           reject_reason?: string | null
           status?: string
           tracking_id?: string | null
@@ -151,6 +185,7 @@ export type Database = {
           cost_price?: number
           created_at?: string
           customer_whatsapp?: string
+          deleted_at?: string | null
           delivered_at?: string | null
           delivery_mode?: string | null
           id?: string
@@ -164,6 +199,7 @@ export type Database = {
           product_name?: string
           receipt_hash?: string | null
           receipt_image_url?: string
+          refund_status?: string | null
           reject_reason?: string | null
           status?: string
           tracking_id?: string | null
@@ -411,6 +447,10 @@ export type Database = {
       }
     }
     Functions: {
+      admin_review_order: {
+        Args: { _action: string; _order_id: string; _reason: string }
+        Returns: Json
+      }
       approve_order: { Args: { _order_id: string }; Returns: string }
       get_order_by_tracking_id: {
         Args: { _tracking_id: string }
