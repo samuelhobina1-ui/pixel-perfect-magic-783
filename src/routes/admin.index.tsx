@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -10,18 +10,23 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fillTemplate, naira, settingsQuery, waLink } from "@/lib/store";
 import type { Tables } from "@/integrations/supabase/types";
 import { checkGmailNow } from "@/lib/gmail-poll.functions";
+import { useAdminData } from "./admin.products";
+import { OrderReview } from "@/components/admin/OrderReview";
 
-export const Route = createFileRoute("/admin/")({ component: Dashboard });
+export const Route = createFileRoute("/admin/")({ component: Dashboard, head: () => ({ meta: [{ title: "Orders & restock — Zentra Gaming Hub" }, { name: "description", content: "Manage Zentra orders, payment reviews and low PIN stock." }, { property: "og:title", content: "Zentra order management" }, { property: "og:description", content: "Orders, payment reviews and inventory alerts." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }) });
 
 type Order = Tables<"orders">;
 
 function Dashboard() {
   const qc = useQueryClient();
+  const { products } = useAdminData();
+  const lowProducts = products.filter((p) => p.status === "active" && p.fulfillment_type === "auto_pin" && p.stock < 5).sort((a, b) => a.name.localeCompare(b.name));
+  const restockMessage = `LOW STOCK: ${lowProducts.map((p) => `${p.name.trim()} = ${p.stock}`).join(", ")} - Restock now or auto-delivery will fail!`;
   const { data: settings } = useQuery(settingsQuery);
   const { data: orders = [], refetch, isFetching } = useQuery({
     queryKey: ["admin-orders"], refetchInterval: 30000,
     queryFn: async () => {
-      const { data, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false }).limit(1000);
+      const { data, error } = await supabase.from("orders").select("*").is("deleted_at", null).order("created_at", { ascending: false }).limit(1000);
       if (error) throw error; return data;
     },
   });
@@ -41,10 +46,11 @@ function Dashboard() {
   const verified = orders.filter((o) => o.status === "paid_waiting_manual").filter(filt);
   const sold = orders.filter((o) => o.status === "approved" || o.status === "auto_approved").filter(filt);
   const rejected = orders.filter((o) => o.status === "rejected").filter(filt);
+  const review = orders.filter((o) => ["rejected", "needs_manual_review", "manual_review"].includes(o.status)).filter(filt);
   const today = new Date().toDateString();
   const soldToday = sold.filter((o) => o.delivered_at && new Date(o.delivered_at).toDateString() === today);
   const profitToday = soldToday.reduce((s, o) => s + Number(o.price) - Number(o.cost_price), 0);
-  const low = stock.filter((s) => (s.stock_count ?? 0) <= (settings?.low_stock_threshold ?? 5)).length;
+  const low = lowProducts.length;
   const reload = () => { qc.invalidateQueries({ queryKey: ["admin-orders"] }); qc.invalidateQueries({ queryKey: ["admin-stock-low"] }); };
 
   const sendWa = (o: Order, pin: string) => {
@@ -94,6 +100,11 @@ function Dashboard() {
 
   return (
     <div className="space-y-6">
+      {!!lowProducts.length && <section role="alert" className="border border-destructive bg-destructive/15 p-4">
+        <h2 className="font-bold text-destructive">URGENT RESTOCK</h2>
+        <p className="mt-1 text-sm">{lowProducts.map((p) => `${p.name.trim()} has ${p.stock} left`).join(", ")}</p>
+        <div className="mt-3 flex flex-wrap gap-2"><Button asChild variant="destructive"><Link to="/admin/stock">Add PINs</Link></Button><Button asChild variant="outline"><a href={waLink("218942368392", restockMessage)} target="_blank" rel="noreferrer">Send WhatsApp reminder</a></Button></div>
+      </section>}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {[["Waiting approval", pending.length, "text-warning"], ["Sold today", soldToday.length, "text-primary"], ["Profit today", naira(profitToday), "text-accent"], ["Low stock", low, "text-destructive"]].map(([l, v, c]) => (
           <div key={l as string} className="card-glow p-4"><p className="text-xs text-muted-foreground">{l}</p><p className={`font-display text-2xl font-bold ${c}`}>{v}</p></div>
@@ -104,10 +115,11 @@ function Dashboard() {
         <Button variant="outline" onClick={() => refetch()}><RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} /></Button>
       </div>
       <Tabs defaultValue="pending">
-        <TabsList>
+        <TabsList className="h-auto flex-wrap justify-start">
           <TabsTrigger value="pending">Pending ({pending.length})</TabsTrigger>
           <TabsTrigger value="verified">Zentra Verified ({verified.length})</TabsTrigger>
           <TabsTrigger value="sold">Approved & Auto-Sent ({sold.length})</TabsTrigger>
+          <TabsTrigger value="review">Needs Manual Review ({review.length})</TabsTrigger>
           <TabsTrigger value="rejected">Rejected ({rejected.length})</TabsTrigger>
         </TabsList>
         <TabsContent value="pending" className="overflow-x-auto rounded-lg border border-warning/40">
@@ -183,6 +195,7 @@ function Dashboard() {
               ))}</tbody></table>
           </div>
         </TabsContent>
+        <TabsContent value="review"><OrderReview orders={review} /></TabsContent>
         <TabsContent value="rejected" className="overflow-x-auto rounded-lg border border-destructive/40">
           <table className="w-full"><thead><tr>{["Order", "Date", "Product", "Price", "WhatsApp", "Reason"].map((h) => <th key={h} className={th}>{h}</th>)}</tr></thead>
             <tbody>{rejected.map((o) => (
