@@ -6,8 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { naira } from "@/lib/store";
+import { adminHead } from "@/lib/page-head";
 
-export const Route = createFileRoute("/admin/sms")({ component: Sms });
+export const Route = createFileRoute("/admin/sms")({ component: Sms, head: () => adminHead("Moniepoint alerts", "Review stored Zentra Moniepoint bank alerts.") });
 
 const copy = (t: string) => { navigator.clipboard.writeText(t); toast.success("Copied"); };
 

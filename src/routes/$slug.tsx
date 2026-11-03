@@ -21,6 +21,8 @@ export const Route = createFileRoute("/$slug")({
         { name: "description", content: `Buy ${n} instantly. Pay in Naira via Moniepoint.` },
         { property: "og:title", content: `${n} — ZENTRA GAMING HUB` },
         { property: "og:description", content: `${n} top-ups paid in Naira via Moniepoint.` },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary" },
       ] : [{ title: "Unavailable — ZENTRA GAMING HUB" }, { name: "robots", content: "noindex" }],
     };
   },

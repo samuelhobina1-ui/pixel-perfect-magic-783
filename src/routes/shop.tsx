@@ -10,6 +10,8 @@ export const Route = createFileRoute("/shop")({
       { name: "description", content: "All recharge cards and game currencies: Libyana, Almadar, LTT, CODM, PUBG, Free Fire, TikTok." },
       { property: "og:title", content: "Shop — ZENTRA GAMING HUB" },
       { property: "og:description", content: "Every recharge and game top-up in one place, priced in Naira." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   loader: ({ context }) => Promise.all([

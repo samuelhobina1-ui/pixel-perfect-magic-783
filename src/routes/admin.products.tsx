@@ -13,8 +13,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { naira, slugify, uploadProductImage } from "@/lib/store";
 import type { Tables } from "@/integrations/supabase/types";
+import { adminHead } from "@/lib/page-head";
 
-export const Route = createFileRoute("/admin/products")({ component: Products });
+export const Route = createFileRoute("/admin/products")({ component: Products, head: () => adminHead("Products", "Manage Zentra products, pricing and categories.") });
 
 type Product = Tables<"products"> & { stock: number };
 type Cat = Tables<"categories">;

@@ -13,6 +13,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Buy Libyana, Almadar, LTT data, CODM CP, PUBG UC, Free Fire diamonds and TikTok coins. Pay in Naira via Moniepoint." },
       { property: "og:title", content: "ZENTRA GAMING HUB" },
       { property: "og:description", content: "Recharge cards and game top-ups, paid in Naira via Moniepoint." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   loader: ({ context }) => Promise.all([

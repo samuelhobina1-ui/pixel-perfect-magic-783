@@ -9,6 +9,8 @@ export const Route = createFileRoute("/contact")({
       { name: "description", content: "Reach ZENTRA GAMING HUB on WhatsApp +218942368392." },
       { property: "og:title", content: "Contact ZENTRA GAMING HUB" },
       { property: "og:description", content: "WhatsApp support for orders and top-ups." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Contact,

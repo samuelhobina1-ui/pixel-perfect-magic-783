@@ -5,8 +5,9 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { naira, waLink } from "@/lib/store";
+import { adminHead } from "@/lib/page-head";
 
-export const Route = createFileRoute("/admin/rooms")({ component: Rooms });
+export const Route = createFileRoute("/admin/rooms")({ component: Rooms, head: () => adminHead("Manual top-ups", "Manage paid Zentra game and social top-ups awaiting delivery.") });
 
 const TABS = ["TikTok", "CODM", "PUBG", "Free Fire"] as const;
 const copy = (t: string) => { navigator.clipboard.writeText(t); toast.success("Copied"); };
