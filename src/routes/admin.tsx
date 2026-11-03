@@ -5,10 +5,11 @@ import { LayoutDashboard, Package, Boxes, Settings, LogOut } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { adminHead } from "@/lib/page-head";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Admin — ZENTRA GAMING HUB" }, { name: "robots", content: "noindex" }] }),
+  head: () => adminHead("Admin", "Zentra Gaming Hub order and inventory administration."),
   component: AdminLayout,
 });
 
