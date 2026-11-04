@@ -14,6 +14,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { naira, slugify, uploadProductImage } from "@/lib/store";
 import type { Tables } from "@/integrations/supabase/types";
 import { adminHead } from "@/lib/page-head";
+import { useServerFn } from "@tanstack/react-start";
+import { testClubConnection } from "@/lib/clubkonnect.functions";
+import { CLUB_NETWORKS } from "@/lib/clubkonnect";
 
 export const Route = createFileRoute("/admin/products")({ component: Products, head: () => adminHead("Products", "Manage Zentra products, pricing and categories.") });
 
@@ -148,6 +151,12 @@ function Products() {
 }
 
 function ProductForm({ value, cats, onClose, onSaved }: { value: Partial<Product> | null; cats: Cat[]; onClose: () => void; onSaved: () => void }) {
+  const testConnection = useServerFn(testClubConnection);
+  const { data: plans = [], isFetching: loadingPlans, error: planError, refetch: reloadPlans } = useQuery({ queryKey: ["club-plans"], queryFn: async () => {
+    const result = await testConnection();
+    if (result.balance == null) throw new Error(result.message);
+    return result.plans;
+  }, enabled: !!value, staleTime: 300000 });
   const [f, setF] = useState<Partial<Product>>({});
   const [pins, setPins] = useState("");
   const [newCat, setNewCat] = useState("");
@@ -165,12 +174,15 @@ function ProductForm({ value, cats, onClose, onSaved }: { value: Partial<Product
         const { data, error } = await supabase.from("categories").insert({ name: newCat.trim(), slug: slugify(newCat) }).select().single();
         if (error) throw error; category_id = data.id;
       }
-      const row = { name: f.name!, category_id: category_id!, price_naira: Number(f.price_naira), cost_price: Number(f.cost_price ?? 0), image_url: f.image_url || null, description: f.description || null, how_to_use: f.how_to_use || null, status: f.status ?? "active" };
+      if (!f.name?.trim() || !category_id) throw new Error("Name and category are required");
+      if (f.clubkonnect_plan_code && (!f.clubkonnect_network || !plans.some((p) => p.network === f.clubkonnect_network && p.code === f.clubkonnect_plan_code))) throw new Error("Select a currently available ClubKonnect plan");
+      const row = { name: f.name, category_id, price_naira: Number(f.price_naira), cost_price: Number(f.cost_price ?? 0), image_url: f.image_url || null, description: f.description || null, how_to_use: f.how_to_use || null, status: f.status ?? "active", clubkonnect_network: f.clubkonnect_plan_code ? f.clubkonnect_network : null, clubkonnect_plan_code: f.clubkonnect_plan_code || null, clubkonnect_plan_name: f.clubkonnect_plan_name || null, fulfillment_type: f.clubkonnect_plan_code ? "manual" : f.fulfillment_type ?? "manual" };
       let id = f.id;
       if (id) { const { error } = await supabase.from("products").update(row).eq("id", id); if (error) throw error; }
       else { const { data, error } = await supabase.from("products").insert(row).select().single(); if (error) throw error; id = data.id; }
       const list = pins.split("\n").map((s) => s.trim()).filter(Boolean);
-      if (list.length) { const { error } = await supabase.from("pins_stock").insert(list.map((pin_code) => ({ product_id: id!, pin_code }))); if (error) throw error; }
+      if (!id) throw new Error("Product could not be saved");
+      if (list.length) { const { error } = await supabase.from("pins_stock").insert(list.map((pin_code) => ({ product_id: id, pin_code }))); if (error) throw error; }
       toast.success("Saved — live on the website"); onSaved(); onClose();
     } catch (err) { toast.error(err instanceof Error ? err.message : "Save failed"); } finally { setBusy(false); }
   }
@@ -190,6 +202,14 @@ function ProductForm({ value, cats, onClose, onSaved }: { value: Partial<Product
           <div className="grid grid-cols-2 gap-2">
             <div><Label>Price ₦ *</Label><Input required type="number" min={0} value={f.price_naira ?? ""} onChange={(e) => set("price_naira", e.target.value as unknown as number)} /></div>
             <div><Label>Cost price ₦ (private)</Label><Input type="number" min={0} value={f.cost_price ?? ""} onChange={(e) => set("cost_price", e.target.value as unknown as number)} /></div>
+          </div>
+          <div className="space-y-2"><Label htmlFor="club-network">ClubKonnect network</Label>
+            <select id="club-network" className="h-10 w-full rounded-md border border-input bg-background px-2 text-sm" value={f.clubkonnect_network ?? ""} onChange={(e) => setF((x) => ({ ...x, clubkonnect_network: e.target.value || null, clubkonnect_plan_code: null, clubkonnect_plan_name: null }))}>
+              <option value="">No ClubKonnect delivery</option>{Object.entries(CLUB_NETWORKS).map(([code,name]) => <option key={code} value={code}>{name}</option>)}
+            </select>
+            <Label htmlFor="club-plan">ClubKonnect Plan Code</Label><select id="club-plan" disabled={!f.clubkonnect_network || loadingPlans} className="h-10 w-full rounded-md border border-input bg-background px-2 text-sm" value={f.clubkonnect_plan_code ?? ""} onChange={(e) => { const plan = plans.find((p) => p.network === f.clubkonnect_network && p.code === e.target.value); setF((x) => ({ ...x, clubkonnect_plan_code: plan?.code ?? null, clubkonnect_plan_name: plan?.name ?? null })); }}><option value="">Select plan</option>{plans.filter((p) => p.network === f.clubkonnect_network).map((p) => <option key={p.code} value={p.code}>{p.name} · Code {p.code} · {naira(p.amount)}</option>)}</select>
+            {planError && <p className="text-sm text-destructive">{planError.message}</p>}
+            <Button type="button" variant="outline" size="sm" disabled={loadingPlans} onClick={() => reloadPlans()}>{loadingPlans ? "Loading plans…" : "Refresh plans"}</Button>
           </div>
           <div><Label>Add stock PINs (one per line)</Label><Textarea rows={3} value={pins} onChange={(e) => setPins(e.target.value)} /></div>
           <div><Label>Image</Label>

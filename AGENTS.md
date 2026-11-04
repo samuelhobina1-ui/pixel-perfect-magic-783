@@ -15,3 +15,4 @@
 - Stock and review helpers live in src/lib/admin-stock.ts; admin review uses a separate authenticated database RPC with mandatory reasons and durable history so automatic payment functions stay unchanged.
 - Test-order removal is soft deletion with rejected status, and refunds are manual pending work; this preserves payment evidence and prevents implying a bank transfer occurred.
 - Admin page metadata shares src/lib/page-head.ts to keep private pages consistently marked noindex with unique titles.
+- ClubKonnect uses admin-authenticated server functions with server-only credentials and locked claim/finalization RPCs; submission is once-only, unknown results require status reconciliation, and automatic dispatch stays disabled until receipt safeguards are complete.
