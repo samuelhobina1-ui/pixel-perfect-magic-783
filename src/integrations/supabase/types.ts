@@ -126,6 +126,12 @@ export type Database = {
         Row: {
           auto_checks: Json | null
           category: string
+          clubkonnect_log: Json
+          clubkonnect_network: string | null
+          clubkonnect_order_id: string | null
+          clubkonnect_plan_code: string | null
+          clubkonnect_request_id: string | null
+          clubkonnect_status: string | null
           cost_price: number
           created_at: string
           customer_whatsapp: string
@@ -154,6 +160,12 @@ export type Database = {
         Insert: {
           auto_checks?: Json | null
           category: string
+          clubkonnect_log?: Json
+          clubkonnect_network?: string | null
+          clubkonnect_order_id?: string | null
+          clubkonnect_plan_code?: string | null
+          clubkonnect_request_id?: string | null
+          clubkonnect_status?: string | null
           cost_price?: number
           created_at?: string
           customer_whatsapp: string
@@ -182,6 +194,12 @@ export type Database = {
         Update: {
           auto_checks?: Json | null
           category?: string
+          clubkonnect_log?: Json
+          clubkonnect_network?: string | null
+          clubkonnect_order_id?: string | null
+          clubkonnect_plan_code?: string | null
+          clubkonnect_request_id?: string | null
+          clubkonnect_status?: string | null
           cost_price?: number
           created_at?: string
           customer_whatsapp?: string
@@ -302,6 +320,9 @@ export type Database = {
       products: {
         Row: {
           category_id: string
+          clubkonnect_network: string | null
+          clubkonnect_plan_code: string | null
+          clubkonnect_plan_name: string | null
           cost_price: number
           created_at: string
           deleted_at: string | null
@@ -317,6 +338,9 @@ export type Database = {
         }
         Insert: {
           category_id: string
+          clubkonnect_network?: string | null
+          clubkonnect_plan_code?: string | null
+          clubkonnect_plan_name?: string | null
           cost_price?: number
           created_at?: string
           deleted_at?: string | null
@@ -332,6 +356,9 @@ export type Database = {
         }
         Update: {
           category_id?: string
+          clubkonnect_network?: string | null
+          clubkonnect_plan_code?: string | null
+          clubkonnect_plan_name?: string | null
           cost_price?: number
           created_at?: string
           deleted_at?: string | null
@@ -452,6 +479,17 @@ export type Database = {
         Returns: Json
       }
       approve_order: { Args: { _order_id: string }; Returns: string }
+      claim_clubkonnect_order: { Args: { _order_id: string }; Returns: Json }
+      finish_clubkonnect_order: {
+        Args: {
+          _event: Json
+          _order_id: string
+          _provider_id: string
+          _request_id: string
+          _state: string
+        }
+        Returns: undefined
+      }
       get_order_by_tracking_id: {
         Args: { _tracking_id: string }
         Returns: Json

@@ -85,6 +85,13 @@
       "when": 1793578336974,
       "tag": "0011_admin_order_review_actions",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1793760517836,
+      "tag": "0012_clubkonnect_order_delivery",
+      "breakpoints": true
     }
   ]
 }
