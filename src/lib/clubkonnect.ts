@@ -2,7 +2,7 @@ export const CLUB_NETWORKS = { '01': 'MTN', '02': 'GLO', '03': '9MOBILE', '04': 
 export type ClubPlan = { network: string; code: string; name: string; amount: number };
 export function parseClubPlans(input: unknown): ClubPlan[] {
   if (!input || typeof input !== 'object') return [];
-  const networks = (input as Record<string, unknown>).MOBILE_NETWORK;
+  const networks = (input as Record<string, unknown>)['MOBILE_NETWORK'];
   if (!networks || typeof networks !== 'object') return [];
   const result: ClubPlan[] = [];
   for (const entries of Object.values(networks)) {
@@ -19,8 +19,8 @@ export function parseClubPlans(input: unknown): ClubPlan[] {
   return result;
 }
 export function clubState(input: Record<string, unknown>): 'pending' | 'completed' | 'failed' | 'unknown' {
-  const code = String(input.statuscode ?? input.statusCode ?? '');
-  const status = String(input.orderstatus ?? input.orderStatus ?? input.status ?? '').toUpperCase();
+  const code = String(input['statuscode'] ?? input['statusCode'] ?? '');
+  const status = String(input['orderstatus'] ?? input['orderStatus'] ?? input['status'] ?? '').toUpperCase();
   // Receipt of a request is NOT confirmation of delivery.
   if (code === '200' && status === 'ORDER_COMPLETED') return 'completed';
   if (status === 'ORDER_RECEIVED' || status === 'ORDER_PROCESSING') return 'pending';

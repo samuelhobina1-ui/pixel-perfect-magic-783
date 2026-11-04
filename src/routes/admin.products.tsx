@@ -176,7 +176,7 @@ function ProductForm({ value, cats, onClose, onSaved }: { value: Partial<Product
       }
       if (!f.name?.trim() || !category_id) throw new Error("Name and category are required");
       if (f.clubkonnect_plan_code && (!f.clubkonnect_network || !plans.some((p) => p.network === f.clubkonnect_network && p.code === f.clubkonnect_plan_code))) throw new Error("Select a currently available ClubKonnect plan");
-      const row = { name: f.name, category_id, price_naira: Number(f.price_naira), cost_price: Number(f.cost_price ?? 0), image_url: f.image_url || null, description: f.description || null, how_to_use: f.how_to_use || null, status: f.status ?? "active", clubkonnect_network: f.clubkonnect_plan_code ? f.clubkonnect_network : null, clubkonnect_plan_code: f.clubkonnect_plan_code || null, clubkonnect_plan_name: f.clubkonnect_plan_name || null, fulfillment_type: f.clubkonnect_plan_code ? "manual" : f.fulfillment_type ?? "manual" };
+      const row = { name: f.name, category_id, price_naira: Number(f.price_naira), cost_price: Number(f.cost_price ?? 0), image_url: f.image_url || null, description: f.description || null, how_to_use: f.how_to_use || null, status: f.status ?? "active", clubkonnect_network: f.clubkonnect_plan_code ? f.clubkonnect_network ?? null : null, clubkonnect_plan_code: f.clubkonnect_plan_code || null, clubkonnect_plan_name: f.clubkonnect_plan_name || null, fulfillment_type: f.clubkonnect_plan_code ? "manual" : f.fulfillment_type ?? "manual" };
       let id = f.id;
       if (id) { const { error } = await supabase.from("products").update(row).eq("id", id); if (error) throw error; }
       else { const { data, error } = await supabase.from("products").insert(row).select().single(); if (error) throw error; id = data.id; }

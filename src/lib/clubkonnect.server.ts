@@ -18,5 +18,5 @@ export async function clubPlans(credentials: Credentials) {
 }
 export function sanitizedClubEvent(data: Record<string, unknown>, event: string) {
   // Allowlisted status values only; never persist arbitrary provider text or echoed credentials.
-  return { event, time: new Date().toISOString(), state: clubState(data), code: /^\d{1,6}$/.test(String(data.statuscode ?? data.statusCode ?? '')) ? String(data.statuscode ?? data.statusCode) : null };
+  return { event, time: new Date().toISOString(), state: clubState(data), code: /^\d{1,6}$/.test(String(data['statuscode'] ?? data['statusCode'] ?? '')) ? String(data['statuscode'] ?? data['statusCode']) : null };
 }
