@@ -1,3 +1,8 @@
+# ClubKonnect data delivery
+- [ ] Secure credentials, balance test and plan mapping in admin.
+- [ ] Add verified-payment-only data dispatch, durable order logging and duplicate protection.
+- [ ] Verify integration; live purchase waits for credentials, confirmed plans and payment safeguards.
+
 # Stock and manual review
 - [x] Merge duplicate products, preserving order links and all PINs.
 - [x] Add dashboard restock warning and tap-to-send WhatsApp reminder.
