@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { settingsQuery, slugify, uploadProductImage, type Settings } from "@/lib/store";
 import { useAdminData } from "./admin.products";
 import { adminHead } from "@/lib/page-head";
+import { ClubKonnectSettings } from "@/components/admin/ClubKonnectSettings";
 
 export const Route = createFileRoute("/admin/settings")({ component: SettingsPage, head: () => adminHead("Store settings", "Manage Zentra store payment details, categories and delivery settings.") });
 
@@ -86,6 +87,7 @@ function SettingsPage() {
           ))}
         </ul>
       </div>
+      <ClubKonnectSettings />
     </div>
   );
 }

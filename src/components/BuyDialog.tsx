@@ -38,7 +38,7 @@ export function BuyDialog({ product, onClose }: { product: PublicProduct | null;
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
   const [drag, setDrag] = useState(false);
-  const field = deliveryField(product?.name ?? "");
+  const field = product?.clubkonnect_plan_code ? { label: "Nigerian mobile number *", ph: "08012345678", pattern: "0[789]\\d{9}", title: "11-digit Nigerian mobile number" } : deliveryField(product?.name ?? "");
   const local = wa.replace(/\D/g, "").replace(/^0+/, "");
   const fullWa = `+${cc}${local}`;
 

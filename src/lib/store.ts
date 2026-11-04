@@ -2,12 +2,12 @@ import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export const PUBLIC_PRODUCT_COLS =
-  "id,name,category_id,price_naira,image_url,description,how_to_use,status,created_at,updated_at";
+  "id,name,category_id,price_naira,image_url,description,how_to_use,status,created_at,updated_at,clubkonnect_network,clubkonnect_plan_code";
 
 export type Category = { id: string; name: string; slug: string; image_url: string | null; status: string; sort_order: number };
 export type PublicProduct = {
   id: string; name: string; category_id: string; price_naira: number; image_url: string | null;
-  description: string | null; how_to_use: string | null; status: string; stock: number;
+  description: string | null; how_to_use: string | null; status: string; stock: number; clubkonnect_network?: string | null; clubkonnect_plan_code?: string | null;
 };
 export type Settings = {
   auto_mode: boolean; opay_number: string; opay_name: string; whatsapp_number: string;
