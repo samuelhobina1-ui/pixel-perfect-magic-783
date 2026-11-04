@@ -2,6 +2,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { categoriesQuery, productsQuery } from "@/lib/store";
 import { ProductGrid } from "@/components/ProductGrid";
+import TikTokCustomCalculator from "@/components/TikTokCustomCalculator";
 
 export const Route = createFileRoute("/$slug")({
   loader: async ({ context, params }) => {
@@ -35,10 +36,12 @@ function CategoryPage() {
   const { data: products } = useSuspenseQuery(productsQuery);
   const cat = cats.find((c) => c.slug === slug);
   if (!cat) return null;
+  const isTikTok = slug.toLowerCase().includes("tiktok") || cat.name.toLowerCase().includes("tiktok");
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
       {cat.image_url && <img src={cat.image_url} alt={cat.name} className="mb-6 h-40 w-full rounded-xl object-cover" />}
       <h1 className="mb-6 text-3xl font-bold"><span className="text-primary">{cat.name}</span></h1>
+      {isTikTok && <TikTokCustomCalculator />}
       <ProductGrid products={products.filter((p) => p.category_id === cat.id)} />
     </main>
   );
