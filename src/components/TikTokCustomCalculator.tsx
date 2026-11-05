@@ -1,4 +1,8 @@
 import { useState, useEffect } from "react";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { productsQuery, type PublicProduct } from "@/lib/store";
+import { BuyDialog } from "./BuyDialog";
+
 async function getP2PRate() {
   const cached = localStorage.getItem('p2p_rate');
   const cachedTime = localStorage.getItem('p2p_last_update');
@@ -11,6 +15,7 @@ async function getP2PRate() {
   if (cached) return { rate: Number(cached), source: 'Last-Stored' };
   return { rate: 1650, source: 'Fallback' };
 }
+
 function calculatePrice(coins:number, p2p:number) {
   const costNaira = coins * (0.32/30) * p2p;
   let discount = 1.0; let label = "0%";
@@ -25,29 +30,45 @@ function calculatePrice(coins:number, p2p:number) {
   final = Math.ceil(final / 5) * 5;
   return { final, label };
 }
+
 export default function TikTokCustomCalculator() {
   const [coins, setCoins] = useState(35);
   const [p2p, setP2p] = useState(1685);
   const [source, setSource] = useState("Loading...");
+  const [selected, setSelected] = useState<PublicProduct | null>(null);
+  const { data: products } = useSuspenseQuery(productsQuery);
+
   useEffect(() => { getP2PRate().then(r => { setP2p(r.rate); setSource(r.source); }); }, []);
   const { final, label } = calculatePrice(coins, p2p);
   const valid = coins >= 10 && coins <= 10000;
+
   const buyNow = () => {
-    const msg = encodeURIComponent(`Hi ZENTRA! I want to buy ${coins} TikTok Coins for ₦${final.toLocaleString()} (P2P ₦${p2p} | Discount ${label})`);
-    window.open(`https://wa.me/218942397368?text=${msg}`, '_blank');
+    const base = products.find((p) => /tiktok/i.test(p.name)) ?? products[0];
+    if (!base) return;
+    const customProduct: PublicProduct = {
+      ...base,
+      name: `TikTok Coins - ${coins} Coins (Custom)`,
+      price_naira: final,
+      stock: 999,
+    };
+    setSelected(customProduct);
   };
+
   return (
-    <div className="max-w-md mx-auto bg-black text-white rounded-3xl p-6 border border-green-500/30">
-      <h2 className="text-2xl font-bold text-center text-green-400">Buy Any TikTok Coins - Custom Amount</h2>
-      <div className="flex items-center justify-center gap-3 mt-6">
-        <button onClick={()=>setCoins(Math.max(10, coins-1))} className="w-12 h-12 bg-zinc-800 rounded-full text-2xl font-bold">-</button>
-        <input type="number" value={coins} onChange={e=>setCoins(Number(e.target.value))} placeholder="e.g. 35" className="w-40 text-center bg-zinc-900 border border-green-500 rounded-2xl p-4 text-3xl font-bold text-white" />
-        <button onClick={()=>setCoins(Math.min(10000, coins+1))} className="w-12 h-12 bg-zinc-800 rounded-full text-2xl font-bold">+</button>
+    <>
+      <div className="max-w-md mx-auto bg-black text-white rounded-3xl p-6 border border-green-500/30">
+        <h2 className="text-2xl font-bold text-center text-green-400">Buy Any TikTok Coins - Custom Amount</h2>
+        <div className="flex items-center justify-center gap-3 mt-6">
+          <button onClick={()=>setCoins(Math.max(10, coins-1))} className="w-12 h-12 bg-zinc-800 rounded-full text-2xl font-bold">-</button>
+          <input type="number" value={coins} onChange={e=>setCoins(Number(e.target.value))} placeholder="e.g. 35" className="w-40 text-center bg-zinc-900 border border-green-500 rounded-2xl p-4 text-3xl font-bold text-white" />
+          <button onClick={()=>setCoins(Math.min(10000, coins+1))} className="w-12 h-12 bg-zinc-800 rounded-full text-2xl font-bold">+</button>
+        </div>
+        <p className="text-center text-xs text-gray-400 mt-2">Min 10 - Max 10,000 coins</p>
+        {valid ? (<div className="text-center mt-5 space-y-1"><p className="text-2xl font-bold">{coins} Coins = <span className="text-green-400">₦{final.toLocaleString()}</span></p>{label !== "0%" && <p className="text-green-400 font-bold">🎉 {label} Discount Applied!</p>}<p className="text-sm text-gray-400">💱 P2P Rate: $1 = ₦{p2p.toLocaleString()} ({source} Live)</p><p className="text-xs text-gray-500">You save more when you buy more! 50+ = 5% off, 100+ = 15% off</p></div>) : <p className="text-center text-red-400 mt-4">Enter 10 - 10,000 coins</p>}
+        <button onClick={buyNow} disabled={!valid} className="w-full bg-green-500 text-black font-bold py-4 rounded-2xl mt-5 text-lg">BUY NOW - ₦{final.toLocaleString()}</button>
+        <div className="mt-6 bg-zinc-900 rounded-2xl p-4"><p className="text-sm font-bold mb-2 text-center">Price Chart (at ₦{p2p.toLocaleString()})</p><div className="grid grid-cols-5 text-center text-xs gap-1">{[30,50,100,350,700].map(c => { const pr = calculatePrice(c, p2p).final; return <div key={c} className="bg-zinc-800 rounded-lg p-2"><b>{c}</b><br/>₦{pr.toLocaleString()}</div> })}</div><p className="text-[11px] text-gray-500 text-center mt-2">Minimum lock: ₦800 per 30 coins</p></div>
       </div>
-      <p className="text-center text-xs text-gray-400 mt-2">Min 10 - Max 10,000 coins</p>
-      {valid ? (<div className="text-center mt-5 space-y-1"><p className="text-2xl font-bold">{coins} Coins = <span className="text-green-400">₦{final.toLocaleString()}</span></p>{label !== "0%" && <p className="text-green-400 font-bold">🎉 {label} Discount Applied!</p>}<p className="text-sm text-gray-400">💱 P2P Rate: $1 = ₦{p2p.toLocaleString()} ({source} Live)</p><p className="text-xs text-gray-500">You save more when you buy more! 50+ = 5% off, 100+ = 15% off</p></div>) : <p className="text-center text-red-400 mt-4">Enter 10 - 10,000 coins</p>}
-      <button onClick={buyNow} disabled={!valid} className="w-full bg-green-500 text-black font-bold py-4 rounded-2xl mt-5 text-lg">BUY NOW - ₦{final.toLocaleString()}</button>
-      <div className="mt-6 bg-zinc-900 rounded-2xl p-4"><p className="text-sm font-bold mb-2 text-center">Price Chart (at ₦{p2p.toLocaleString()})</p><div className="grid grid-cols-5 text-center text-xs gap-1">{[30,50,100,350,700].map(c => { const pr = calculatePrice(c, p2p).final; return <div key={c} className="bg-zinc-800 rounded-lg p-2"><b>{c}</b><br/>₦{pr.toLocaleString()}</div> })}</div><p className="text-[11px] text-gray-500 text-center mt-2">Minimum lock: ₦800 per 30 coins</p></div>
-    </div>
+      <BuyDialog product={selected} onClose={() => setSelected(null)} />
+    </>
   );
 }
