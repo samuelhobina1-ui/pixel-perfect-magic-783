@@ -25,7 +25,7 @@ export const categoriesQuery = queryOptions({
   queryFn: async () => {
     const { data, error } = await supabase
       .from("categories").select("*").eq("status", "active").order("sort_order").order("name");
-    if (error) throw error;
+    if (error) { console.error("Categories failed to load", error); return [] as Category[]; }
     return data as Category[];
   },
 });
@@ -33,13 +33,18 @@ export const categoriesQuery = queryOptions({
 export const productsQuery = queryOptions({
   queryKey: ["products"],
   queryFn: async () => {
-    const [{ data, error }, { data: stock }] = await Promise.all([
-      supabase.from("products").select(PUBLIC_PRODUCT_COLS).eq("status", "active").is("deleted_at", null).order("price_naira"),
-      supabase.from("product_stock").select("*"),
-    ]);
-    if (error) throw error;
-    const map = new Map((stock ?? []).map((s) => [s.product_id, s.stock_count ?? 0]));
-    return (data ?? []).map((p) => ({ ...p, stock: map.get(p.id) ?? 0 })) as PublicProduct[];
+    try {
+      const [{ data, error }, { data: stock }] = await Promise.all([
+        supabase.from("products").select(PUBLIC_PRODUCT_COLS).eq("status", "active").is("deleted_at", null).order("price_naira"),
+        supabase.from("product_stock").select("*"),
+      ]);
+      if (error) throw error;
+      const map = new Map((stock ?? []).map((s) => [s.product_id, s.stock_count ?? 0]));
+      return (data ?? []).map((p) => ({ ...p, stock: map.get(p.id) ?? 0 })) as PublicProduct[];
+    } catch (e) {
+      console.error("Products failed to load", e);
+      return [] as PublicProduct[];
+    }
   },
 });
 
