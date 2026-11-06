@@ -110,7 +110,7 @@ export function BuyDialog({ product, onClose }: { product: PublicProduct | null;
               <p className="mt-1 text-xs text-muted-foreground">Pay the exact amount — your order confirms automatically within a few minutes.</p>
             </div>
             {product.how_to_use && <p className="text-xs text-muted-foreground">{product.how_to_use}</p>}
-            <div className="space-y-1"><Label>{field.label}</Label><Input required pattern={field.pattern} title={field.title} placeholder={field.ph} value={playerId} onChange={(e) => setPlayerId(e.target.value)} /></div>
+            <div className="space-y-1"><Label>{field.label}</Label>{field.sub && <p className="text-xs text-muted-foreground">{field.sub}</p>}<Input required type={isDataProduct ? "tel" : "text"} inputMode={isDataProduct ? "numeric" : undefined} maxLength={isDataProduct ? 11 : undefined} pattern={field.pattern} title={field.title} placeholder={field.ph} value={playerId} onChange={(e) => setPlayerId(isDataProduct ? e.target.value.replace(/\D/g, "") : e.target.value)} /></div>
             <div className="space-y-1"><Label>Your WhatsApp number *</Label>
               <div className="flex gap-2">
                 <select value={cc} onChange={(e) => setCc(e.target.value as Code)} className="rounded-md border border-input bg-background px-2 text-sm">
