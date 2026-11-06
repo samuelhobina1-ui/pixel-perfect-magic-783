@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
-import { testClubConnection, deliverClubOrder } from '@/lib/clubkonnect.functions';
+import { testClubConnection, deliverClubOrder, saveClubCredentials } from '@/lib/clubkonnect.functions';
 
 // Fixed - local naira function so build doesn't break
 const naira = (value: number) => `₦${Number(value).toLocaleString()}`;
@@ -14,30 +14,49 @@ const naira = (value: number) => `₦${Number(value).toLocaleString()}`;
 export function ClubKonnectSettings() {
   const test = useServerFn(testClubConnection);
   const deliver = useServerFn(deliverClubOrder);
+  const save = useServerFn(saveClubCredentials);
   const qc = useQueryClient();
   const [busy, setBusy] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [balance, setBalance] = useState<number | null>(null);
-  
-  const { data: orders = [] } = useQuery({ 
-    queryKey: ['club-orders'], 
+  const [userId, setUserId] = useState('');
+  const [apiKey, setApiKey] = useState('');
+
+  const { data: orders = [] } = useQuery({
+    queryKey: ['club-orders'],
     queryFn: async () => {
       const { data, error } = await supabase.from('orders').select('*').is('deleted_at', null).order('created_at', { ascending: false }).limit(50);
       if (error) throw error;
       return data ?? [];
-    } 
+    }
   });
+
+  async function saveCreds() {
+    if (!userId.trim() || !apiKey.trim()) { toast.error('Enter both UserID and API Key'); return; }
+    setSaving(true);
+    try {
+      await save({ data: { userId: userId.trim(), apiKey: apiKey.trim() } });
+      toast.success('Credentials saved securely');
+      setUserId('');
+      setApiKey('');
+      setMessage('Credentials saved. Now press Test Connection.');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Could not save credentials');
+    } finally { setSaving(false); }
+  }
 
   async function check() {
     setBusy(true);
-    try { 
-      const result = await test(); 
-      setMessage(result.message); 
-      setBalance(result.balance); 
-      qc.setQueryData(['club-plans'], result.plans); 
+    try {
+      const result = await test();
+      setMessage(result.message);
+      setBalance(result.balance);
+      qc.setQueryData(['club-plans'], result.plans);
     }
-    catch (error) { 
-      setMessage(error instanceof Error ? error.message : 'Connection check failed'); 
+    catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Connection check failed');
+      setBalance(null);
     }
     finally { setBusy(false); }
   }
@@ -50,8 +69,8 @@ export function ClubKonnectSettings() {
       toast[result.state === 'failed' ? 'error' : 'success'](result.state === 'completed' ? 'Data delivered' : result.state === 'failed' ? 'Delivery failed — refund pending manual processing' : 'Delivery not confirmed yet. Use Check delivery; do not resend.');
       await Promise.all(['club-orders', 'orders', 'admin-orders'].map((key) => qc.invalidateQueries({ queryKey: [key] })));
       setBalance(null);
-    } catch (error) { 
-      toast.error(error instanceof Error ? error.message : 'Delivery failed'); 
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Delivery failed');
     }
     finally { setBusy(false); }
   }
@@ -59,10 +78,13 @@ export function ClubKonnectSettings() {
   return <section className="space-y-4 border-t border-border pt-6 lg:col-span-2">
     <h2 className="text-lg font-bold">ClubKonnect</h2>
     <div className="grid gap-3 sm:grid-cols-2">
-      <div><Label htmlFor="club-user">ClubKonnect UserID</Label><Input id="club-user" readOnly value="Stored securely" /></div>
-      <div><Label htmlFor="club-key">ClubKonnect API Key</Label><Input id="club-key" type="password" readOnly value="stored-securely" /></div>
+      <div><Label htmlFor="club-user">ClubKonnect UserID</Label><Input id="club-user" value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="Stored securely — enter to update" autoComplete="off" /></div>
+      <div><Label htmlFor="club-key">ClubKonnect API Key</Label><Input id="club-key" type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="Stored securely — enter to update" autoComplete="off" /></div>
     </div>
-    <Button onClick={check} disabled={busy}>{busy ? 'Checking…' : 'Test Connection'}</Button>
+    <div className="flex flex-wrap gap-2">
+      <Button variant="secondary" onClick={saveCreds} disabled={saving}>{saving ? 'Saving…' : 'Save Credentials'}</Button>
+      <Button onClick={check} disabled={busy}>{busy ? 'Checking…' : 'Test Connection'}</Button>
+    </div>
     {message && <p role="status" className="text-sm text-muted-foreground">{message}{balance != null ? ` · Wallet balance: ${naira(balance)}` : ''}</p>}
     <p className="text-sm text-warning">Automatic data delivery is paused pending receipt safety checks. Admin approval required. Refunds are manual.</p>
     <h3 className="font-semibold">Data delivery & transaction history</h3>

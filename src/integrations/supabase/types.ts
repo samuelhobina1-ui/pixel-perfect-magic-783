@@ -44,6 +44,27 @@ export type Database = {
         }
         Relationships: []
       }
+      clubkonnect_credentials: {
+        Row: {
+          api_key: string
+          id: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          api_key: string
+          id?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          api_key?: string
+          id?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       lyd_naira_map: {
         Row: {
           lyd_amount: number

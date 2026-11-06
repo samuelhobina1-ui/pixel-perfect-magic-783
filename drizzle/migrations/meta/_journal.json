@@ -99,6 +99,13 @@
       "when": 1793837244180,
       "tag": "0013_grant_public_product_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1793924612188,
+      "tag": "0014_clubkonnect_credentials",
+      "breakpoints": true
     }
   ]
 }
