@@ -1,39 +1,67 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-    }});
+    return new Response(null, { headers: corsHeaders });
   }
+
   try {
-    const { action, phone, plan_code, amount } = await req.json();
-    const USERID = Deno.env.get("CLUBKONNECT_USERID");
-    const APIKEY = Deno.env.get("CLUBKONNECT_APIKEY");
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, serviceKey);
+
+    const { data: cred } = await supabase
+      .from("clubkonnect_credentials")
+      .select("user_id, api_key")
+      .eq("id", 1)
+      .single();
+
+    if (!cred) throw new Error("No credentials in clubkonnect_credentials table");
+
+    const USERID = cred.user_id;
+    const APIKEY = cred.api_key;
+
+    const { action, ...rest } = await req.json();
+
     let url = "";
     let body: any = { UserID: USERID, APIKey: APIKEY };
-    if (action === "balance") {
+
+    if (action === "buy-airtime") {
+      url = "https://www.clubkonnect.com/api/airtime/";
+      body = { ...body, MobileNetwork: rest.network, MobileNumber: rest.phone, Amount: rest.amount };
+    } else if (action === "buy-data") {
+      url = "https://www.clubkonnect.com/api/data/";
+      body = { ...body, MobileNetwork: rest.network, DataPlan: rest.planId, MobileNumber: rest.phone };
+    } else if (action === "get-plans") {
+      url = "https://www.clubkonnect.com/api/get-data-plans/";
+      body = { ...body, MobileNetwork: rest.network };
+    } else if (action === "check-balance") {
       url = "https://www.clubkonnect.com/api/balance/";
+    } else {
+      throw new Error("Unknown action: " + action);
     }
-    if (action === "buy-data") {
-      url = "https://www.clubkonnect.com/api/buy-data/";
-      body = { ...body, phone: phone, plan_code: plan_code, amount: amount };
-    }
-    if (action === "plans") {
-      url = "https://www.clubkonnect.com/api/plans/";
-    }
-    const res = await fetch(url, {
+
+    const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
-    const data = await res.json();
-    return new Response(JSON.stringify(data), { headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-    }});
-  } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500 });
+
+    const data = await response.json();
+
+    return new Response(JSON.stringify(data), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });
