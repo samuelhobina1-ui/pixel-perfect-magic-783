@@ -11,7 +11,7 @@ export async function clubRequest(path: string, credentials: Credentials, params
   // Do not follow redirects with credentials or print provider URLs (they contain the API key).
   let response: Response;
   try {
-    response = await fetch(url, { redirect: 'error', signal: AbortSignal.timeout(25000) });
+    response = await fetch(url, { redirect: 'manual', signal: AbortSignal.timeout(25000) });
   } catch (err) {
     console.error('[clubkonnect] network failure', path, err instanceof Error ? err.message : 'unknown');
     throw new Error('ClubKonnect could not be reached (network error). Do not resubmit deliveries; reconcile first.');
